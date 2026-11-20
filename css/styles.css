@@ -1,0 +1,149 @@
+/* 
+  She & She Kids Wear - Premium E-Commerce Stylesheet
+  Soft pastel pink, cream, light peach, and white luxury palette.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Caveat:wght@600;700&display=swap');
+
+:root {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-hand: 'Caveat', cursive;
+
+  --color-pink-soft: #FCE7F3;
+  --color-pink-50: #FDF2F8;
+  --color-peach-soft: #FFE4E6;
+  --color-peach-50: #FFF1F2;
+  --color-cream-soft: #FFFDF7;
+  --color-cream-100: #FEF9C3;
+  --color-rose-deep: #BE185D;
+  --color-rose-600: #E11D48;
+  --color-rose-dark: #9D174D;
+  --color-gold: #F59E0B;
+}
+
+/* Custom Base Typography */
+body {
+  font-family: var(--font-sans);
+  background-color: #FFFDF7;
+  color: #1E293B;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, .font-serif {
+  font-family: var(--font-serif);
+}
+
+.font-hand {
+  font-family: var(--font-hand);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #FFFDF7;
+}
+::-webkit-scrollbar-thumb {
+  background: #FBCFE8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #F472B6;
+}
+
+/* Pastel Shimmer & Glow Effects */
+.bg-pastel-gradient {
+  background: linear-gradient(135deg, #FFFDF7 0%, #FDF2F8 50%, #FFE4E6 100%);
+}
+
+.bg-hero-glow {
+  background: radial-gradient(circle at 70% 30%, rgba(252, 231, 243, 0.7) 0%, rgba(255, 241, 242, 0.5) 45%, rgba(255, 253, 247, 0) 70%);
+}
+
+.shadow-pastel {
+  box-shadow: 0 10px 30px -5px rgba(244, 114, 182, 0.15), 0 4px 6px -2px rgba(244, 114, 182, 0.05);
+}
+
+.shadow-pastel-lg {
+  box-shadow: 0 20px 40px -15px rgba(219, 39, 119, 0.2);
+}
+
+/* Smooth Image Transitions */
+.image-zoom-container {
+  overflow: hidden;
+}
+.image-zoom-container img {
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.image-zoom-container:hover img {
+  transform: scale(1.06);
+}
+
+/* Floating animation for badge stickers */
+@keyframes softFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+.animate-soft-float {
+  animation: softFloat 4s ease-in-out infinite;
+}
+
+/* Micro Heart Animation */
+@keyframes heartPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.animate-heart-pop {
+  animation: heartPop 0.3s ease-out;
+}
+
+/* Size Pill Selection Indicator */
+.size-btn.active {
+  background-color: #BE185D !important;
+  color: #FFFFFF !important;
+  border-color: #BE185D !important;
+  box-shadow: 0 4px 12px rgba(190, 24, 93, 0.3);
+}
+
+/* Color Swatch Selection */
+.color-swatch.active {
+  ring-width: 2px;
+  --tw-ring-color: #BE185D;
+  --tw-ring-offset-width: 2px;
+  transform: scale(1.1);
+}
+
+/* Category Filter Active */
+.category-tab.active {
+  background: linear-gradient(135deg, #BE185D 0%, #DB2777 100%);
+  color: #FFFFFF;
+  box-shadow: 0 6px 16px rgba(190, 24, 93, 0.25);
+}
+
+/* Print Invoice Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #order-invoice-area, #order-invoice-area * {
+    visibility: visible;
+  }
+  #order-invoice-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+}
