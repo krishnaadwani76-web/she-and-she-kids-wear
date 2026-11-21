@@ -1321,7 +1321,7 @@ function openPolicyModal(policyType) {
       content: `
         <p><strong>Because kids grow fast!</strong> We offer a hassle-free 7-day exchange policy for size replacements.</p>
         <p>• <strong>Eligibility:</strong> Items must be unused, unwashed, and in their original packaging with tags intact.</p>
-        <p>• <strong>Exchange Process:</strong> Simply WhatsApp us at <strong class="text-rose-600">+91 98290 12345</strong> or visit our Dadabari Kota store. We will arrange a reverse pickup or direct store swap.</p>
+        <p>• <strong>Exchange Process:</strong> Simply WhatsApp us at <a href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection." target="_blank" class="text-rose-600 font-bold hover:underline">+91 88248 44263</a> or call <a href="tel:+918824844263" class="text-rose-600 font-bold hover:underline">8824844263</a>, or visit our Dadabari Kota store. We will arrange a reverse pickup or direct store swap.</p>
         <p>• <strong>Damaged on Arrival:</strong> In the rare event of receiving a transit-damaged item, notify us within 48 hours for immediate replacement.</p>
       `
     },

@@ -1037,7 +1037,7 @@ function renderContentTab(container) {
               <input
                 type="text"
                 id="content-phone"
-                value="${settings.storeInfo?.phone || '+91 98290 12345'}"
+                value="${settings.storeInfo?.phone || '+91 88248 44263'}"
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>
@@ -1047,7 +1047,7 @@ function renderContentTab(container) {
               <input
                 type="text"
                 id="content-whatsapp"
-                value="${settings.storeInfo?.whatsapp || '+919829012345'}"
+                value="${settings.storeInfo?.whatsapp || '+918824844263'}"
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>

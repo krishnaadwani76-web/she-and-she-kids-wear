@@ -209,8 +209,8 @@ export function renderFooter() {
             <div class="space-y-1.5 text-xs">
               <div class="text-slate-300 font-semibold">Flagship Retail Store:</div>
               <div>${STORE_INFO.address}</div>
-              <div>Phone: <span class="text-white font-bold">${STORE_INFO.phone}</span></div>
-              <div>Email: <span class="text-rose-400 font-medium">${STORE_INFO.email}</span></div>
+              <div>Phone: <a href="tel:+918824844263" class="text-white hover:text-rose-400 font-bold transition">+91 88248 44263</a></div>
+              <div>Email: <a href="mailto:${STORE_INFO.email}" class="text-rose-400 font-medium hover:underline">${STORE_INFO.email}</a></div>
             </div>
           </div>
 
@@ -235,7 +235,7 @@ export function renderFooter() {
               <li><a href="#size-guide" class="hover:text-rose-400 transition">Kids Size Chart (1–16Y)</a></li>
               <li><a href="#contact" class="hover:text-rose-400 transition">Contact Dadabari Store</a></li>
               <li><button class="policy-open-btn hover:text-rose-400 transition text-left" data-policy="returns">Shipping & Easy Exchange</button></li>
-              <li><a href="https://wa.me/919829012345" target="_blank" class="hover:text-emerald-400 transition text-emerald-400 font-semibold">WhatsApp Support</a></li>
+              <li><a href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection." target="_blank" class="hover:text-emerald-400 transition text-emerald-400 font-semibold">WhatsApp Support (8824844263)</a></li>
             </ul>
           </div>
 
@@ -276,7 +276,7 @@ export function renderFooter() {
 
     <!-- Floating WhatsApp Support Button -->
     <a
-      href="https://wa.me/919829012345?text=Hello%20She%20%26%20She%20Kids%20Wear,%20I%20need%20help%20with%20an%20outfit..."
+      href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection."
       target="_blank"
       rel="noopener noreferrer"
       class="fixed bottom-6 left-6 z-40 bg-emerald-500 hover:bg-emerald-600 text-white p-3.5 rounded-full shadow-2xl flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 group shadow-emerald-500/40"

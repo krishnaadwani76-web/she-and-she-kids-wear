@@ -59,7 +59,7 @@ export function renderContactSection() {
                 </div>
                 <div class="space-y-1">
                   <div class="font-bold text-slate-900 text-xs">Customer Support & Orders:</div>
-                  <div>Phone: <a href="tel:${STORE_INFO.phone}" class="font-bold text-slate-800 hover:text-rose-600">${STORE_INFO.phone}</a></div>
+                  <div>Phone: <a href="tel:+918824844263" class="font-bold text-slate-800 hover:text-rose-600">${STORE_INFO.phone}</a></div>
                   <div>Email: <a href="mailto:${STORE_INFO.email}" class="font-semibold text-rose-600 hover:underline">${STORE_INFO.email}</a></div>
                 </div>
               </div>
@@ -78,7 +78,7 @@ export function renderContactSection() {
               <!-- WhatsApp Direct Action Button -->
               <div class="pt-2">
                 <a
-                  href="https://wa.me/919829012345?text=Hello%20She%20%26%20She%20Kids%20Wear,%20I%20have%20an%20inquiry%20about%20your%20kidswear%20collection."
+                  href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection."
                   target="_blank"
                   rel="noopener noreferrer"
                   class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2 group"
@@ -157,7 +157,7 @@ export function renderContactSection() {
                     <input
                       type="tel"
                       required
-                      placeholder="+91 98290XXXXX"
+                      placeholder="+91 88248XXXXX"
                       class="w-full px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs focus:outline-none focus:ring-2 focus:ring-rose-400"
                     />
                   </div>

@@ -79,7 +79,7 @@ export function renderCheckoutModal() {
                         required
                         maxlength="10"
                         pattern="[0-9]{10}"
-                        placeholder="9829012345"
+                        placeholder="8824844263"
                         class="w-full px-3 py-2.5 rounded-r-xl border border-rose-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-rose-400"
                       />
                     </div>

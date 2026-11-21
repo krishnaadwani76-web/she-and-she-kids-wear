@@ -500,8 +500,8 @@ VALUES
         "storeName": "She & She Kids Wear",
         "tagline": "Making Every Childhood More Stylish",
         "subtitle": "Discover adorable outfits for every little moment.",
-        "phone": "+91 98290 12345",
-        "whatsapp": "+919829012345",
+        "phone": "+91 88248 44263",
+        "whatsapp": "+918824844263",
         "email": "care@sheandshekidswear.com",
         "address": "Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan, India - 324009",
         "timings": "Monday – Saturday: 10:30 AM – 9:00 PM | Sunday: 11:00 AM – 8:00 PM",
@@ -541,7 +541,7 @@ ON CONFLICT (key) DO UPDATE SET
 -- ============================================================================
 INSERT INTO public.customers (id, name, email, phone, address, city, state, pincode, orders_count, total_spent)
 VALUES
-    ('cust_01', 'Pooja Sharma', 'pooja.sharma@example.com', '9829054321', 'House 12, Talwandi', 'Kota', 'Rajasthan', '324005', 1, 1599.00),
+    ('cust_01', 'Pooja Sharma', 'pooja.sharma@example.com', '9829154321', 'House 12, Talwandi', 'Kota', 'Rajasthan', '324005', 1, 1599.00),
     ('cust_02', 'Amitabh Verma', 'amitabh.v@example.com', '9414012345', 'Flat 402, Royal Residency, Dadabari', 'Kota', 'Rajasthan', '324009', 1, 1899.00)
 ON CONFLICT (phone) DO NOTHING;
 
@@ -555,7 +555,7 @@ INSERT INTO public.orders (
     'SSKW-78219',
     'Pooja Sharma',
     'pooja.sharma@example.com',
-    '9829054321',
+    '9829154321',
     'House 12, Talwandi',
     'Kota',
     'Rajasthan',

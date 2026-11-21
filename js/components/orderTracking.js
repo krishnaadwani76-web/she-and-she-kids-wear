@@ -35,7 +35,7 @@ export function renderOrderTrackingModal(initialOrderId = "") {
               <input
                 id="tracking-search-input"
                 type="text"
-                placeholder="e.g. SSKW-84920 or 9829012345"
+                placeholder="e.g. SSKW-84920 or 8824844263"
                 value="${initialOrderId}"
                 class="flex-1 px-4 py-3 rounded-2xl border border-rose-200 text-sm font-semibold uppercase bg-white focus:outline-none focus:ring-2 focus:ring-rose-400"
               />

@@ -27,9 +27,9 @@ export function renderHeader() {
             Dadabari, Kota, Rajasthan
           </span>
           <span class="text-rose-300">|</span>
-          <a href="tel:${settings.storeInfo?.phone || '+919829012345'}" class="hover:text-white transition flex items-center gap-1">
+          <a href="tel:${settings.storeInfo?.phone ? settings.storeInfo.phone.replace(/[^0-9+]/g, '') : '+918824844263'}" class="hover:text-white transition flex items-center gap-1">
             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 4V3z"/></svg>
-            ${settings.storeInfo?.phone || '+91 98290 12345'}
+            ${settings.storeInfo?.phone || '+91 88248 44263'}
           </a>
         </div>
 
@@ -250,6 +250,17 @@ export function renderHeader() {
             <a href="#track-order" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-800 font-semibold hover:bg-rose-50 hover:text-rose-600">
               <span>📦 Track Your Order</span>
             </a>
+
+            <!-- Mobile Direct Call & WhatsApp Buttons -->
+            <div class="pt-2 grid grid-cols-2 gap-2">
+              <a href="tel:+918824844263" class="py-2.5 px-3 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                <span>📞 Call</span>
+                <span>8824844263</span>
+              </a>
+              <a href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection." target="_blank" class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm">
+                <span>💬 WhatsApp</span>
+              </a>
+            </div>
           </div>
 
           <div class="pt-4 border-t border-rose-100 space-y-3">

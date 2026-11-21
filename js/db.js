@@ -78,7 +78,7 @@ class StoreDB {
           customer: {
             name: "Pooja Sharma",
             email: "pooja.sharma@example.com",
-            phone: "9829054321",
+            phone: "9829154321",
             address: "House 12, Talwandi",
             city: "Kota",
             state: "Rajasthan",
@@ -154,7 +154,7 @@ class StoreDB {
           id: "cust_1",
           name: "Pooja Sharma",
           email: "pooja.sharma@example.com",
-          phone: "9829054321",
+          phone: "9829154321",
           city: "Kota",
           ordersCount: 1,
           totalSpent: 1599,
@@ -202,6 +202,26 @@ class StoreDB {
         shippingPolicy: "Orders are dispatched within 24 hours from Dadabari, Kota. Delivery within 2-4 business days across Rajasthan, and 3-6 days across India."
       };
       localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(settings));
+    } else {
+      // Auto-migrate any cached old phone numbers in existing localStorage
+      try {
+        const storedSettings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS) || "null");
+        if (storedSettings && storedSettings.storeInfo) {
+          if (
+            !storedSettings.storeInfo.phone ||
+            storedSettings.storeInfo.phone.includes("98290") ||
+            (storedSettings.storeInfo.whatsapp && storedSettings.storeInfo.whatsapp.includes("98290"))
+          ) {
+            storedSettings.storeInfo.phone = "+91 88248 44263";
+            storedSettings.storeInfo.whatsapp = "+918824844263";
+            storedSettings.storeInfo.whatsappClean = "918824844263";
+            storedSettings.storeInfo.whatsappUrl = "https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection.";
+            localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(storedSettings));
+          }
+        }
+      } catch (e) {
+        console.warn("Could not check settings phone migration:", e);
+      }
     }
 
     // 7. Admin Credentials (default)
