@@ -9,6 +9,7 @@ import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js";
 import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js";
 import { showToast } from "./utils/toast.js";
 import { initiateRazorpayPayment } from "./utils/razorpay.js";
+import { setCanonicalUrl } from "./utils/seo.js";
 
 // Components
 import { renderHeader } from "./components/header.js";
@@ -616,37 +617,49 @@ function setupEventListeners() {
 }
 
 /**
- * Handle URL hash routing (#category/boys, #product/prod_001, #track-order, etc.)
+ * Handle URL hash routing (#category/boys, #product/rose-blush-princess-tulle-party-frock, #track-order, etc.)
  */
 function handleHashChange() {
-  const hash = window.location.hash || "#home";
+  const rawHash = window.location.hash || "#home";
+  // Strip any query strings (e.g. ?utm_source=... inside or after hash)
+  const hash = rawHash.split("?")[0] || "#home";
 
   if (hash.startsWith("#category/")) {
     const cat = hash.replace("#category/", "");
-    setCategory(cat);
+    setCategory(cat, false);
+    setCanonicalUrl(`#category/${cat}`);
     scrollToSection("catalog-section");
   } else if (hash === "#new-arrivals") {
-    setCategory("new");
+    setCategory("new", false);
+    setCanonicalUrl("#category/new");
     scrollToSection("catalog-section");
   } else if (hash === "#best-sellers") {
-    setCategory("bestsellers");
+    setCategory("bestsellers", false);
+    setCanonicalUrl("#category/bestsellers");
     scrollToSection("catalog-section");
   } else if (hash.startsWith("#product/")) {
-    const prodId = hash.replace("#product/", "");
-    openProductModal(prodId);
+    const prodIdOrSlug = hash.replace("#product/", "");
+    openProductModal(prodIdOrSlug);
   } else if (hash === "#track-order") {
+    setCanonicalUrl("#track-order");
     openTrackingModal();
   } else if (hash === "#size-guide") {
+    setCanonicalUrl("#size-guide");
     const p = db.getProducts()[0];
     if (p) openProductModal(p.id);
   } else if (hash === "#contact") {
+    setCanonicalUrl("#contact");
     scrollToSection("contact");
   } else if (hash === "#admin" || hash === "#admin-login") {
+    setCanonicalUrl("admin.html");
     if (db.isAdminAuthenticated()) {
       openAdminDashboard();
     } else {
       openAdminLoginModal();
     }
+  } else {
+    // Default Home
+    setCanonicalUrl("/");
   }
 }
 
@@ -657,10 +670,22 @@ function scrollToSection(id) {
   }
 }
 
-function setCategory(catId) {
+function setCategory(catId, updateUrl = true) {
   state.currentCategory = catId;
   updateCategoryTabsUI();
   renderProductGrid();
+
+  if (catId === "all") {
+    setCanonicalUrl("/");
+    if (updateUrl && window.location.hash.startsWith("#category/")) {
+      window.history.replaceState(null, "", "#home");
+    }
+  } else {
+    setCanonicalUrl(`#category/${catId}`);
+    if (updateUrl) {
+      window.history.replaceState(null, "", `#category/${catId}`);
+    }
+  }
 }
 
 function renderCategoryTabsUI() {
@@ -713,9 +738,15 @@ function updateBadges() {
 
 /* ------------------- MODAL CONTROLLERS ------------------- */
 
-function openProductModal(productId) {
-  const product = db.getProductById(productId);
+function openProductModal(productIdOrSlug) {
+  const product = db.getProductById(productIdOrSlug) || db.getProductBySlug(productIdOrSlug);
   if (!product) return;
+
+  const productSlug = product.slug || product.id;
+  setCanonicalUrl(`#product/${productSlug}`);
+  if (window.location.hash !== `#product/${productSlug}`) {
+    window.history.replaceState(null, "", `#product/${productSlug}`);
+  }
 
   const mount = document.getElementById("modal-container");
   if (!mount) return;
@@ -826,13 +857,24 @@ function openProductModal(productId) {
     if (sizeChartModal) sizeChartModal.classList.add("hidden");
   });
 
-  // Close Button
+  // Close Button & Backdrop
   mount.querySelector("#close-product-modal-btn")?.addEventListener("click", closeModal);
+  mount.querySelector("#product-detail-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "product-detail-modal") closeModal();
+  });
 
   function closeModal() {
     mount.innerHTML = "";
     if (window.location.hash.startsWith("#product/")) {
-      window.location.hash = "#catalog-section";
+      const targetHash = state.currentCategory && state.currentCategory !== "all"
+        ? `#category/${state.currentCategory}`
+        : "#catalog-section";
+      window.history.replaceState(null, "", targetHash);
+    }
+    if (state.currentCategory && state.currentCategory !== "all") {
+      setCanonicalUrl(`#category/${state.currentCategory}`);
+    } else {
+      setCanonicalUrl("/");
     }
   }
 }
@@ -1018,6 +1060,11 @@ function openCheckoutModal() {
 }
 
 function openTrackingModal(prefilledOrderId = "") {
+  setCanonicalUrl("#track-order");
+  if (window.location.hash !== "#track-order") {
+    window.history.replaceState(null, "", "#track-order");
+  }
+
   const mount = document.getElementById("tracking-modal-mount");
   if (!mount) return;
 
@@ -1028,8 +1075,24 @@ function openTrackingModal(prefilledOrderId = "") {
   const resultArea = mount.querySelector("#tracking-result-area");
   const closeBtn = mount.querySelector("#close-tracking-modal-btn");
 
-  closeBtn?.addEventListener("click", () => {
+  const closeTracking = () => {
     mount.innerHTML = "";
+    if (window.location.hash === "#track-order") {
+      const targetHash = state.currentCategory && state.currentCategory !== "all"
+        ? `#category/${state.currentCategory}`
+        : "#home";
+      window.history.replaceState(null, "", targetHash);
+    }
+    if (state.currentCategory && state.currentCategory !== "all") {
+      setCanonicalUrl(`#category/${state.currentCategory}`);
+    } else {
+      setCanonicalUrl("/");
+    }
+  };
+
+  closeBtn?.addEventListener("click", closeTracking);
+  mount.querySelector("#order-tracking-modal")?.addEventListener("click", (e) => {
+    if (e.target.id === "order-tracking-modal") closeTracking();
   });
 
   const performTrack = (query) => {

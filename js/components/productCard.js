@@ -49,7 +49,7 @@ export function renderProductCard(product) {
           </button>
 
           <!-- Product Photos (Primary + Hover) -->
-          <a href="#product/${product.id}" class="block w-full h-full">
+          <a href="#product/${product.slug || product.id}" class="block w-full h-full">
             <img
               src="${primaryImage}"
               alt="${product.name}"
@@ -98,7 +98,7 @@ export function renderProductCard(product) {
             ${product.category === 'girls' ? "Girls Wear" : product.category === 'boys' ? "Boys Wear" : product.category === 'baby' ? "Baby Toddler" : "Kids Fashion"}
           </div>
           <h3 class="font-serif font-bold text-sm sm:text-base text-slate-900 group-hover:text-rose-600 transition line-clamp-1">
-            <a href="#product/${product.id}">
+            <a href="#product/${product.slug || product.id}">
               ${product.name}
             </a>
           </h3>

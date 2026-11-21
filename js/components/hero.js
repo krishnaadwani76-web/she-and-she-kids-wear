@@ -108,7 +108,7 @@ export function renderHero() {
                       <span class="text-xl font-black text-yellow-300">₹1,599</span>
                       <span class="text-xs text-white/60 line-through">₹2,499</span>
                     </div>
-                    <a href="#product/prod_001" class="px-3.5 py-1.5 rounded-full bg-white text-rose-700 text-xs font-bold hover:bg-rose-50 transition">
+                    <a href="#product/rose-blush-princess-tulle-party-frock" class="px-3.5 py-1.5 rounded-full bg-white text-rose-700 text-xs font-bold hover:bg-rose-50 transition">
                       View Outfit →
                     </a>
                   </div>
