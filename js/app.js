@@ -56,6 +56,16 @@ function initApp() {
     if (scope === "products" || scope === "all") {
       renderProductGrid();
     }
+    if (scope === "categories" || scope === "all") {
+      renderCategoryTabsUI();
+      renderProductGrid();
+    }
+    if (scope === "settings" || scope === "all") {
+      const headerMount = document.getElementById("header-mount");
+      if (headerMount) headerMount.innerHTML = renderHeader();
+      const heroMount = document.getElementById("hero-mount");
+      if (heroMount) heroMount.innerHTML = renderHero();
+    }
   });
 }
 
@@ -93,7 +103,7 @@ function renderMainShell() {
 
           <!-- Category Chips -->
           <div class="flex items-center gap-2.5 overflow-x-auto pb-2 scrollbar-none" id="category-tabs-container">
-            ${CATEGORIES.map(
+            ${db.getCategories().filter(c => c.isActive !== false).map(
               (cat) => `
               <button
                 type="button"
@@ -254,14 +264,25 @@ function renderProductGrid() {
   const allProducts = db.getProducts();
 
   let filtered = allProducts.filter((p) => {
-    // 1. Category Filter
-    if (state.currentCategory === "girls" && p.category !== "girls") return false;
-    if (state.currentCategory === "boys" && p.category !== "boys") return false;
-    if (state.currentCategory === "baby" && p.category !== "baby") return false;
-    if (state.currentCategory === "party" && p.subCategory !== "party" && p.category !== "party") return false;
-    if (state.currentCategory === "casual" && p.subCategory !== "casual" && p.category !== "casual") return false;
-    if (state.currentCategory === "new" && !p.isNew) return false;
-    if (state.currentCategory === "bestsellers" && !p.isBestSeller) return false;
+    // 0. Active visibility filter (hide disabled/archived products from customers)
+    if (p.isActive === false) return false;
+
+    // 1. Dynamic Category Filter
+    if (state.currentCategory && state.currentCategory !== "all") {
+      if (state.currentCategory === "new") {
+        if (!p.isNew) return false;
+      } else if (state.currentCategory === "bestsellers") {
+        if (!p.isBestSeller) return false;
+      } else if (state.currentCategory === "party") {
+        if (p.category !== "party" && p.subCategory !== "party") return false;
+      } else if (state.currentCategory === "casual") {
+        if (p.category !== "casual" && p.subCategory !== "casual") return false;
+      } else if (state.currentCategory === "sale") {
+        if (!p.discountPrice || p.discountPrice >= p.price) return false;
+      } else {
+        if (p.category !== state.currentCategory && p.subCategory !== state.currentCategory) return false;
+      }
+    }
 
     // 2. Search Query Filter
     if (state.searchQuery) {
@@ -620,6 +641,12 @@ function handleHashChange() {
     if (p) openProductModal(p.id);
   } else if (hash === "#contact") {
     scrollToSection("contact");
+  } else if (hash === "#admin" || hash === "#admin-login") {
+    if (db.isAdminAuthenticated()) {
+      openAdminDashboard();
+    } else {
+      openAdminLoginModal();
+    }
   }
 }
 
@@ -634,6 +661,23 @@ function setCategory(catId) {
   state.currentCategory = catId;
   updateCategoryTabsUI();
   renderProductGrid();
+}
+
+function renderCategoryTabsUI() {
+  const container = document.getElementById("category-tabs-container");
+  if (!container) return;
+  const categories = db.getCategories().filter(c => c.isActive !== false);
+  container.innerHTML = categories.map((cat) => `
+    <button
+      type="button"
+      class="category-tab px-4 py-2 rounded-full border border-rose-200 text-xs font-bold text-slate-700 bg-white hover:border-rose-400 hover:bg-rose-50 transition shrink-0 flex items-center gap-1.5 ${
+        state.currentCategory === cat.id ? "active" : ""
+      }"
+      data-category-id="${cat.id}"
+    >
+      <span>${cat.name}</span>
+    </button>
+  `).join("");
 }
 
 function updateCategoryTabsUI() {
@@ -1142,6 +1186,29 @@ function openAdminDashboard() {
   });
   mount.querySelector("#cancel-product-form-btn")?.addEventListener("click", () => {
     if (productFormModal) productFormModal.classList.add("hidden");
+  });
+
+  // Direct Image Upload from Computer in Modal
+  const fileInput = mount.querySelector("#form-product-file");
+  fileInput?.addEventListener("change", async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const indicator = mount.querySelector("#form-upload-indicator");
+      if (indicator) indicator.classList.remove("hidden");
+      try {
+        const { optimizeAndUploadImage } = await import("./supabaseClient.js");
+        const res = await optimizeAndUploadImage(file);
+        if (res && res.url) {
+          const imgInput = mount.querySelector("#form-product-image");
+          if (imgInput) imgInput.value = res.url;
+          showToast("Product photo optimized and uploaded!", "success");
+        }
+      } catch (err) {
+        showToast(err.message, "error");
+      } finally {
+        if (indicator) indicator.classList.add("hidden");
+      }
+    }
   });
 
   // Save Product Form

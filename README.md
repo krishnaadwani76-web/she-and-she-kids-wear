@@ -1,130 +1,128 @@
-# She & She Kids Wear — E-Commerce Website & Brand Portal
+# She & She Kids Wear — E-Commerce Website & Admin Control Center
 
 > **"Making Every Childhood More Stylish"**  
 > Premium, comfortable, and affordable clothing for children aged 1–16 years.  
-> **Flagship Boutique:** Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan - 324009, India.
+> **Physical Boutique:** Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan - 324009, India.  
+> **Live Website:** [https://krishnaadwani76-web.github.io/she-and-she-kids-wear/](https://krishnaadwani76-web.github.io/she-and-she-kids-wear/)  
+> **Admin Dashboard:** [https://krishnaadwani76-web.github.io/she-and-she-kids-wear/admin.html](https://krishnaadwani76-web.github.io/she-and-she-kids-wear/admin.html)
 
 ---
 
-## 🌸 Brand Overview & Design System
+## 🌸 Brand Overview & Architecture
 
-**She & She Kids Wear** is an Indian children's fashion e-commerce platform designed for parents seeking royal festive wear, elegant birthday frocks, dapper kurta-jacket sets, and breathable organic everyday playwear.
+**She & She Kids Wear** is a full-featured e-commerce platform and back-office management system designed for a premier Indian kidswear brand in Dadabari, Kota.
 
 ### 🎨 Visual & Palette Identity
 * **Soft Pastel Pink (`#FCE7F3`, `#FDF2F8`)**: Warm, gentle aesthetic representing innocent childhood joy.
-* **Warm Cream & Off-White (`#FFFDF7`, `#FEF9C3`)**: Clean backdrop enhancing product color clarity.
+* **Warm Cream & Off-White (`#FFFDF7`, `#FEF9C3`)**: Clean, luxurious backdrop enhancing product clarity.
 * **Light Peach (`#FFE4E6`, `#FFF1F2`)**: Friendly accents for badges, chips, and micro-interactions.
 * **Deep Royal Rose (`#BE185D`, `#DB2777`)**: High-contrast, accessible primary buttons, badges, and CTAs.
 * **Typography**:
   * Headings: *Playfair Display* (Editorial luxury serif).
-  * Interface & Descriptions: *Plus Jakarta Sans* (Clean, modern geometry).
+  * Interface & Descriptions: *Plus Jakarta Sans* (Clean modern geometry).
 
 ---
 
-## 🚀 Key Features
+## 🔐 Complete Backend & Admin Dashboard
 
-### 1. 🛍️ Comprehensive Product Catalog & Categories
-* **Boys Wear**: Slub Chanderi Kurtas with floral Nehru jackets, European linen shirts, velvet bandhgala tuxedos, and dungarees.
-* **Girls Wear**: French tulle princess frocks, Bandhani & Gota Patti Anarkali suits, floral tiered dresses, and Banarasi brocade lehengas.
-* **Baby Wear (1–3 Years)**: 4-layer GOTS organic muslin rompers with bonnets, soft sleepsuits with fold-over scratch mittens.
-* **Party Wear**: Red-carpet velvets, sequin-embroidered frocks, and festive ethnic wear.
-* **Casual Wear**: Breathable combed cotton playsuits, summer shorts, and cozy bear fleece sets.
-* **Special Highlights**: New Arrivals, Best Sellers, and Limited Festive Offers.
+The application features a dedicated, standalone **Admin Control Center** accessible via `/admin.html` or through the storefront footer and top navigation (`#admin`).
 
-### 2. 📏 Comprehensive Sizing (1–16 Years)
-Full support for 10 age-based sizes:
-* **1–2 Years** • **2–3 Years** • **3–4 Years** • **4–5 Years** • **5–6 Years**
-* **7–8 Years** • **9–10 Years** • **11–12 Years** • **13–14 Years** • **15–16 Years**
-* Interactive **Size Chart Modal** displaying chest, dress length, waist, and child height in both cm and inches.
+### 1. 🛡️ Admin Authentication & Security
+* **Authentication**: Email and password credentials with session expiration and route protection.
+* **Default Store Credentials**:
+  * **Email**: `admin@sheandshe.com`
+  * **Password**: `admin123`
+* **Route Protection**: Direct access to `/admin.html` requires administrator authentication before dashboard data is displayed.
+* **Cloud Auth**: Seamlessly integrates with Supabase Auth (`supabase.auth.signInWithPassword`).
 
-### 3. 🎨 Color Swatches & Dynamic Switching
-* Interactive color swatches update the active photo preview on product cards and modals.
-* Selected color name and size are accurately preserved in the cart and order invoice.
+### 2. 📊 Store Dashboard Overview
+* **KPI Metrics**: Total Sales Revenue (₹), Total Orders, Pending Orders (requiring fulfillment), Active Catalog Products, and Low Stock inventory alerts (< 5 items).
+* **Recent Orders Table**: Quick view of recent customer purchases with instant order status update controls.
+* **System Status**: Displays live Supabase Cloud connection or offline Local Storage fallback.
 
-### 4. 🛒 Shopping Cart & Free Delivery Meter
-* Slide-out cart drawer with real-time quantity adjusters (`+`/`-`) and item deletion.
-* Dynamic **Free Shipping Progress Bar** (Free delivery unlocked above ₹999).
-* Coupon system:
-  * `FIRSTKID`: Flat 15% OFF for new parents.
-  * `KIDSWEAR10`: Flat 10% OFF on all items.
-  * `KOTA500`: ₹500 OFF on orders above ₹2,500.
+### 3. 👗 Product Management & Direct Photo Uploads
+* **Direct Image Upload**: Select images directly from your computer (Drag-and-drop or file picker).
+* **Automatic Performance Optimization**: High-resolution camera photos are automatically scaled and compressed using an in-memory Canvas to ensure fast loading speeds on mobile devices.
+* **Cloud Storage**: Uploads photos to the Supabase Cloud Storage bucket (`product-images`) and generates permanent CDN links.
+* **Full Product CRUD**: Add, edit, and delete products with real-time updates on the storefront.
+* **Product Details**: Name, regular MRP, discounted selling price, inventory stock, badges (e.g. *Bestseller*, *Trending*), fabric details, age group, comfort & styling, and washing instructions.
+* **Age Sizes (1–16 Years)**: Selectable checkboxes for:
+  `1-2Y`, `2-3Y`, `3-4Y`, `4-5Y`, `5-6Y`, `7-8Y`, `9-10Y`, `11-12Y`, `13-14Y`, `15-16Y`.
+* **Colour Swatches**: Add color swatches with built-in color picker and matching image assignments.
+* **Catalog Visibility**: 1-click enable/disable toggle to hide out-of-season or archived products from customers.
 
-### 5. 💳 Checkout & Razorpay Payment Gateway (Test Mode)
-* Complete delivery address form with Indian state selection and 6-digit PIN code validation.
-* Multiple payment methods:
-  * **Online Payment Gateway (Razorpay)**: Integrates the official Razorpay Checkout SDK with test mode support for UPI, Cards, and Netbanking.
-  * **Cash on Delivery (COD)**: Available for all Indian PIN codes.
-  * **Direct Store UPI**: Instant payment verification to the Dadabari Kota store.
-* Print-ready confirmation receipt with unique Order ID (e.g. `SSKW-84920`).
+### 4. 🏷️ Dynamic Category Management
+* Add, edit, and delete product categories directly from the admin panel without editing code.
+* Built-in support for:
+  * **Girls Wear** (Frocks, Anarkalis, Twirl Dresses)
+  * **Boys Wear** (Kurtas, Nehru Jackets, Linen Shirts, Tuxedos)
+  * **Born Baby** (Hypoallergenic Organic Essentials for 0-12 Months)
+  * **Baby Wear** (Muslin Rompers, Sleepsuits for 1-3 Years)
+  * **Party Wear** (Festive Brocade, Tuxedos, Birthday Gowns)
+  * **Casual Wear** (Play Suits, Dungarees, Cotton Sets)
+  * **New Arrivals** & **Sale / Offers**
 
-### 6. 📦 Live Order Tracking
-* Search by **Order ID** or **Customer Phone Number**.
-* 4-stage tracking journey:
-  1. Order Placed
-  2. Processing & Packed at Dadabari Store
-  3. Dispatched / In Transit via BlueDart Express / Delhivery
-  4. Out for Delivery & Delivered
+### 5. 📦 Order Fulfillment & Shipment Tracking
+* View complete customer details: Full Name, Phone, Email, Delivery Address, City, State, and PIN code.
+* View itemized order summary: Product name, size, selected color, quantity, and line-item total.
+* **Order Status Workflow**:
+  `Pending` → `Confirmed` → `Processing` → `Shipped` → `Delivered` → `Cancelled`.
+* **Courier & Tracking Details**: Add courier partner name (e.g., Delhivery, BlueDart, DTDC), AWB tracking number, and tracking link for customer order tracking.
 
-### 7. 📍 Dadabari, Kota Boutique & Contact Section
-* Embedded Google Map centered on Dadabari, Kota.
-* One-click "Get Directions" button.
-* Floating WhatsApp customer support button.
-* Active inquiry form for custom party wear or sizing advice.
-
-### 8. 🔐 Full Store Admin Dashboard
-* **Default Admin Credentials**:
-  * Email: `admin@sheandshe.com`
-  * Password: `admin123`
-* **Features**:
-  * Real-time metrics: Revenue, Orders Count, Product Count, and Low Stock Alerts.
-  * Product CRUD: Add new outfits with image URL, edit descriptions, adjust prices, and toggle sizes.
-  * Order Management: Change status (`Pending`, `Processing`, `Shipped`, `Delivered`, `Cancelled`).
-  * Customer Directory: View customer lifetime spend and past order counts.
-  * Gateway Configuration: Configure custom Razorpay Key ID (`rzp_test_...` or live key).
-  * Data Backup: One-click JSON database export and factory reset.
+### 6. 🎨 Website Content Management
+Store owners can update all website content in real time from the admin panel:
+* **Homepage Banner**: Update banner image URL or upload new banner photos.
+* **Headings & Subtitles**: Update headline, subheading, and promotional badges.
+* **Announcement Bar**: Edit the top notification banner and set free delivery thresholds.
+* **Store Contact Details**: Update phone number, WhatsApp customer care number, and email.
+* **Store Location**: Edit Dadabari Kota address and Google Maps directions link.
+* **Policies**: Edit 7-day return policy, shipping timelines, and About Us story.
 
 ---
 
-## 💻 How to Run the Website
+## ☁️ Supabase Database & Cloud Storage Setup
 
-### Option 1: Using the PowerShell Web Server (Recommended on Windows)
-1. Right-click `server.ps1` and select **Run with PowerShell**, or run in terminal:
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File .\server.ps1
-   ```
-2. The browser will automatically open: `http://localhost:3000/`
+The project includes production-ready database definitions in `schema.sql`.
 
-### Option 2: Direct Browser Launch
-Open `index.html` directly in any web browser (Google Chrome, Microsoft Edge, Firefox, Safari).
+### Quick Setup Steps:
+1. Sign up for a free account at [https://supabase.com](https://supabase.com) and create a **New Project**.
+2. Open the **SQL Editor** from your Supabase Project Dashboard.
+3. Open `schema.sql` from this repository, copy all contents, paste into the SQL editor, and click **RUN**.
+   * Creates the `categories`, `products`, `customers`, `orders`, `order_items`, and `site_settings` tables.
+   * Configures Row Level Security (RLS) policies.
+   * Sets up the `product-images` storage bucket.
+   * Inserts the initial seed kidswear products and store settings.
+4. Go to **Project Settings → API** and copy:
+   * **Project URL** (e.g., `https://xyzcompany.supabase.co`)
+   * **anon / public key** (e.g., `eyJhbGciOiJIUzI1Ni...`)
+5. Open your Admin Dashboard at `/admin.html`, go to the **Cloud & Supabase Setup** tab, paste the Project URL and Anon Key, and click **Save Credentials**.
+6. Click **Test Live Connection** to verify your database connection.
+7. Click **Sync Local Catalog to Supabase Database** to push all initial products and categories to your cloud database in one click!
 
-### Option 3: VS Code / Live Server
-Right-click `index.html` and click **Open with Live Server**.
-
----
-
-## 🌐 Deploying to Production & Connecting a Custom Domain
-
-### Deploying to Netlify (1-Click)
-1. Push this folder to a GitHub repository.
-2. Sign in to [Netlify](https://www.netlify.com).
-3. Click **Add new site** → **Import an existing project** from GitHub.
-4. Set Publish Directory to `.` (root).
-5. Click **Deploy Site**.
-
-### Connecting a Custom Domain (e.g. `sheandshekidswear.com`)
-1. In the Netlify / Vercel dashboard, go to **Domain management** → **Add custom domain**.
-2. Enter your domain: `sheandshekidswear.com`.
-3. Update DNS records at your domain registrar (GoDaddy, Hostinger, Namecheap):
-   * `CNAME` for `www` pointing to your deployment URL.
-   * `A` record pointing to the hosting IP address.
-4. Automatic free SSL certificates (HTTPS) will be provisioned.
+> 🔒 **Security Notice:** Frontend code and GitHub only use the public `anon` key. Never expose your `service_role` secret key or PostgreSQL database password in frontend code or repository commits.
 
 ---
 
-## 🔑 Razorpay Payment Gateway Setup Guide
+## 💻 Local Development
 
-1. Create a free account at [Razorpay](https://razorpay.com).
-2. Go to **Settings** → **API Keys** → Generate **Test Key ID**.
-3. Log in to the She & She Admin Panel (`admin@sheandshe.com` / `admin123`).
-4. Go to **Gateway & Settings** tab and paste your `rzp_test_xxxxxxxx` key into the **Razorpay Key ID** field.
-5. Save settings. All checkout transactions will now use your own Razorpay test account!
+### Option 1: PowerShell Local Server (Windows)
+```powershell
+powershell -ExecutionPolicy Bypass -File .\server.ps1
+```
+Opens the storefront at `http://localhost:3000/` and admin portal at `http://localhost:3000/admin.html`.
+
+### Option 2: Live Server or Any Static Host
+Serve the project directory using VS Code Live Server, Python (`python -m http.server 3000`), or Node (`npx serve .`).
+
+---
+
+## 📦 Deployment
+
+The project is structured as a modern static web application compatible with:
+* **GitHub Pages**: Deployed automatically from the `main` branch.
+* **Netlify**: Configured via `netlify.toml`.
+* **Vercel**: Configured via `vercel.json`.
+
+---
+
+© 2026 **She & She Kids Wear**. All Rights Reserved. Dadabari, Kota, Rajasthan, India.

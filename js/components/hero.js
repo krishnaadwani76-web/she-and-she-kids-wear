@@ -1,9 +1,25 @@
 /**
  * Hero Banner & Feature Badges Component
  * Luxurious pastel hero with animated elements, high-impact CTA, and value propositions.
+ * Automatically synchronizes with Website Content settings from the database.
  */
 
+import { db } from "../db.js";
+
 export function renderHero() {
+  const settings = db.getSettings();
+
+  const heroHeading = settings.heroHeading || "Making Every Childhood";
+  const heroSubtitle =
+    settings.heroSubtitle ||
+    "Discover adorable outfits for every little moment. From royal festive frocks and dapper kurta sets to everyday organic playwear — crafted with pure breathable fabrics for happy, active kids.";
+  const promoBadge =
+    settings.promoBadge ||
+    "New Spring / Festive 2026 Collection • Ages 1 to 16 Years";
+  const heroBannerImage =
+    settings.heroBannerImage ||
+    "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=1000&q=85";
+
   return `
     <section class="relative overflow-hidden bg-pastel-gradient pt-8 pb-16 lg:pt-14 lg:pb-24">
       <!-- Background Ambient Blobs -->
@@ -18,20 +34,18 @@ export function renderHero() {
             
             <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-rose-100/80 border border-rose-200 text-rose-700 text-xs font-bold tracking-wide shadow-sm animate-soft-float">
               <span class="flex h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
-              <span>New Spring / Festive 2026 Collection</span>
-              <span class="text-rose-400">•</span>
-              <span class="text-amber-700">Ages 1 to 16 Years</span>
+              <span>${promoBadge}</span>
             </div>
 
             <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-              Making Every Childhood
+              ${heroHeading.includes(".") ? heroHeading.replace(".", "") : heroHeading}
               <span class="block bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 bg-clip-text text-transparent italic">
                 More Stylish.
               </span>
             </h1>
 
             <p class="text-slate-600 text-base sm:text-lg max-w-xl mx-auto lg:mx-0 font-normal leading-relaxed">
-              Discover adorable outfits for every little moment. From royal festive frocks and dapper kurta sets to everyday organic playwear — crafted with pure breathable fabrics for happy, active kids.
+              ${heroSubtitle}
             </p>
 
             <!-- CTA Buttons -->
@@ -77,8 +91,8 @@ export function renderHero() {
               <div class="relative rounded-3xl overflow-hidden shadow-2xl shadow-rose-200/70 border-4 border-white bg-white group">
                 <div class="aspect-[4/5] overflow-hidden">
                   <img
-                    src="https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=1000&q=85"
-                    alt="She & She Kids Wear Festive Frock"
+                    src="${heroBannerImage}"
+                    alt="She & She Kids Wear Festive Collection"
                     class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>

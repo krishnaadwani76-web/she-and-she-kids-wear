@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard | She & She Kids Wear Dadabari Kota</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rose: {
+              50: '#FDF2F8', 100: '#FCE7F3', 200: '#FBCFE8', 300: '#F472B6',
+              400: '#E879F9', 500: '#EC4899', 600: '#DB2777', 700: '#BE185D',
+              800: '#9D174D', 900: '#831843', 950: '#500724'
+            },
+            peach: { 50: '#FFF1F2', 100: '#FFE4E6', 200: '#FECDD3', 300: '#FDA4AF', 400: '#FB7185', 500: '#F43F5E' },
+            cream: { 50: '#FFFDF7', 100: '#FEF9C3', 200: '#FEF08A' }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+            hand: ['Caveat', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body class="bg-slate-900 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- Toast Notification Mount -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-[99999] flex flex-col gap-2.5 max-w-sm pointer-events-none"></div>
+
+  <!-- Admin App Root Mount -->
+  <div id="admin-root" class="min-h-screen flex flex-col flex-1"></div>
+
+  <!-- Main ES Module Script for Admin Portal -->
+  <script type="module" src="./js/adminApp.js"></script>
+</body>
+</html>
