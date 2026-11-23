@@ -617,38 +617,54 @@ function setupEventListeners() {
 }
 
 /**
- * Handle URL hash routing (#category/boys, #product/rose-blush-princess-tulle-party-frock, #track-order, etc.)
+ * Resolves active route from hash or pathname for clean SEO URL support
+ */
+function getActiveRoute() {
+  const rawHash = (window.location.hash || "").split("?")[0];
+  if (rawHash && rawHash !== "#" && rawHash !== "#home") {
+    return rawHash;
+  }
+  const pathname = window.location.pathname || "";
+  if (pathname && pathname !== "/" && pathname !== "/index.html") {
+    return "#" + pathname.replace(/^\//, "");
+  }
+  return rawHash || "#home";
+}
+
+/**
+ * Handle URL routing (#category/boys, #product/rose-blush-princess-tulle-party-frock, #track-order, etc.)
  */
 function handleHashChange() {
-  const rawHash = window.location.hash || "#home";
-  // Strip any query strings (e.g. ?utm_source=... inside or after hash)
-  const hash = rawHash.split("?")[0] || "#home";
+  const hash = getActiveRoute();
 
   if (hash.startsWith("#category/")) {
     const cat = hash.replace("#category/", "");
     setCategory(cat, false);
-    setCanonicalUrl(`#category/${cat}`);
+    setCanonicalUrl(`/category/${cat}`);
     scrollToSection("catalog-section");
   } else if (hash === "#new-arrivals") {
     setCategory("new", false);
-    setCanonicalUrl("#category/new");
+    setCanonicalUrl("/category/new");
     scrollToSection("catalog-section");
   } else if (hash === "#best-sellers") {
     setCategory("bestsellers", false);
-    setCanonicalUrl("#category/bestsellers");
+    setCanonicalUrl("/category/bestsellers");
     scrollToSection("catalog-section");
   } else if (hash.startsWith("#product/")) {
     const prodIdOrSlug = hash.replace("#product/", "");
     openProductModal(prodIdOrSlug);
   } else if (hash === "#track-order") {
-    setCanonicalUrl("#track-order");
+    setCanonicalUrl("/track-order");
     openTrackingModal();
   } else if (hash === "#size-guide") {
-    setCanonicalUrl("#size-guide");
+    setCanonicalUrl("/size-guide");
     const p = db.getProducts()[0];
     if (p) openProductModal(p.id);
   } else if (hash === "#contact") {
-    setCanonicalUrl("#contact");
+    setCanonicalUrl("/contact");
+    scrollToSection("contact");
+  } else if (hash === "#about") {
+    setCanonicalUrl("/about");
     scrollToSection("contact");
   } else if (hash === "#admin" || hash === "#admin-login") {
     setCanonicalUrl("admin.html");
@@ -681,7 +697,7 @@ function setCategory(catId, updateUrl = true) {
       window.history.replaceState(null, "", "#home");
     }
   } else {
-    setCanonicalUrl(`#category/${catId}`);
+    setCanonicalUrl(`/category/${catId}`);
     if (updateUrl) {
       window.history.replaceState(null, "", `#category/${catId}`);
     }
@@ -743,7 +759,7 @@ function openProductModal(productIdOrSlug) {
   if (!product) return;
 
   const productSlug = product.slug || product.id;
-  setCanonicalUrl(`#product/${productSlug}`);
+  setCanonicalUrl(`/product/${productSlug}`);
   if (window.location.hash !== `#product/${productSlug}`) {
     window.history.replaceState(null, "", `#product/${productSlug}`);
   }
@@ -872,7 +888,7 @@ function openProductModal(productIdOrSlug) {
       window.history.replaceState(null, "", targetHash);
     }
     if (state.currentCategory && state.currentCategory !== "all") {
-      setCanonicalUrl(`#category/${state.currentCategory}`);
+      setCanonicalUrl(`/category/${state.currentCategory}`);
     } else {
       setCanonicalUrl("/");
     }
@@ -1060,7 +1076,7 @@ function openCheckoutModal() {
 }
 
 function openTrackingModal(prefilledOrderId = "") {
-  setCanonicalUrl("#track-order");
+  setCanonicalUrl("/track-order");
   if (window.location.hash !== "#track-order") {
     window.history.replaceState(null, "", "#track-order");
   }
@@ -1084,7 +1100,7 @@ function openTrackingModal(prefilledOrderId = "") {
       window.history.replaceState(null, "", targetHash);
     }
     if (state.currentCategory && state.currentCategory !== "all") {
-      setCanonicalUrl(`#category/${state.currentCategory}`);
+      setCanonicalUrl(`/category/${state.currentCategory}`);
     } else {
       setCanonicalUrl("/");
     }

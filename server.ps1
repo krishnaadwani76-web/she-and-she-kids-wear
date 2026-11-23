@@ -55,11 +55,21 @@ while ($listener.IsListening) {
                 ".svg"  { "image/svg+xml" }
                 ".webp" { "image/webp" }
                 ".ico"  { "image/x-icon" }
+                ".xml"  { "application/xml; charset=utf-8" }
+                ".txt"  { "text/plain; charset=utf-8" }
                 default { "application/octet-stream" }
             }
 
             $bytes = [System.IO.File]::ReadAllBytes($localPath)
             $response.ContentType = $mime
+            $response.ContentLength64 = $bytes.Length
+            $response.StatusCode = 200
+            $response.OutputStream.Write($bytes, 0, $bytes.Length)
+        } elseif (-not [System.IO.Path]::HasExtension($path)) {
+            # SPA Fallback for clean URLs (/category/..., /product/..., /contact, etc.)
+            $indexPath = [System.IO.Path]::Combine($folder, "index.html")
+            $bytes = [System.IO.File]::ReadAllBytes($indexPath)
+            $response.ContentType = "text/html; charset=utf-8"
             $response.ContentLength64 = $bytes.Length
             $response.StatusCode = 200
             $response.OutputStream.Write($bytes, 0, $bytes.Length)

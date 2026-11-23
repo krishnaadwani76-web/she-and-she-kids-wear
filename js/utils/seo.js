@@ -9,8 +9,9 @@ export const PRODUCTION_DOMAIN = "https://sheandshekidswear.com";
 
 /**
  * Clean any tracking parameters (UTMs, fbclid, gclid, etc.) and arbitrary queries from a path/hash
+ * Normalizes routes into clean canonical paths (e.g., #category/girls -> /category/girls).
  * @param {string} inputPath
- * @returns {string} Clean path or hash
+ * @returns {string} Clean canonical path
  */
 export function sanitizeCanonicalPath(inputPath = "") {
   if (!inputPath || inputPath === "/" || inputPath === "#" || inputPath === "#home") {
@@ -28,45 +29,34 @@ export function sanitizeCanonicalPath(inputPath = "") {
     // Keep path as is if parse fails
   }
 
-  // Separate hash and query if present
+  // Separate hash and search queries
   let [beforeHash, hashPart] = path.includes("#") ? path.split("#") : [path, ""];
 
-  // Clean beforeHash of any ?utm_... or query strings
+  // Clean beforeHash of query strings (e.g. ?utm_source=...)
   if (beforeHash.includes("?")) {
-    const [pathname, search] = beforeHash.split("?");
-    const params = new URLSearchParams(search);
-    const trackingParams = [
-      "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
-      "gclid", "fbclid", "msclkid", "mc_eid", "ref", "source"
-    ];
-    trackingParams.forEach((tp) => params.delete(tp));
-    const cleanSearch = params.toString();
-    beforeHash = pathname + (cleanSearch ? `?${cleanSearch}` : "");
+    beforeHash = beforeHash.split("?")[0];
   }
 
-  // Clean hashPart if it contains query parameters (e.g. #category/girls?utm_source=fb)
+  // Clean hashPart of query strings (e.g. #category/girls?utm_source=fb)
   if (hashPart && hashPart.includes("?")) {
-    const [hashRoute, hashSearch] = hashPart.split("?");
-    const params = new URLSearchParams(hashSearch);
-    const trackingParams = [
-      "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content",
-      "gclid", "fbclid", "msclkid", "mc_eid", "ref", "source"
-    ];
-    trackingParams.forEach((tp) => params.delete(tp));
-    const cleanSearch = params.toString();
-    hashPart = hashRoute + (cleanSearch ? `?${cleanSearch}` : "");
+    hashPart = hashPart.split("?")[0];
   }
 
-  // Recombine cleanly
-  let clean = "";
-  if (beforeHash && beforeHash !== "/") {
-    clean += beforeHash.startsWith("/") ? beforeHash : `/${beforeHash}`;
-  }
-  if (hashPart) {
-    clean += `#${hashPart}`;
+  // Choose the active route part (hash takes priority for in-page navigation)
+  let cleanRoute = hashPart || beforeHash || "";
+  cleanRoute = cleanRoute.replace(/^#/, "").trim();
+
+  // Root / Home equivalents
+  if (!cleanRoute || cleanRoute === "/" || cleanRoute === "home" || cleanRoute === "index.html") {
+    return "";
   }
 
-  return clean;
+  // Format with leading slash
+  if (!cleanRoute.startsWith("/")) {
+    cleanRoute = "/" + cleanRoute;
+  }
+
+  return cleanRoute;
 }
 
 /**
@@ -79,13 +69,7 @@ export function buildCanonicalUrl(routeOrPath = "") {
   if (!clean || clean === "/") {
     return `${PRODUCTION_DOMAIN}/`;
   }
-  if (clean.startsWith("#")) {
-    return `${PRODUCTION_DOMAIN}/${clean}`;
-  }
-  if (clean.startsWith("/")) {
-    return `${PRODUCTION_DOMAIN}${clean}`;
-  }
-  return `${PRODUCTION_DOMAIN}/${clean}`;
+  return `${PRODUCTION_DOMAIN}${clean.startsWith("/") ? clean : "/" + clean}`;
 }
 
 /**
@@ -93,7 +77,7 @@ export function buildCanonicalUrl(routeOrPath = "") {
  * Guarantees exactly ONE canonical tag exists in <head>.
  * Also updates Open Graph <meta property="og:url"> for SEO/social consistency.
  *
- * @param {string} routeOrPath - e.g. '', '#category/girls', '#product/rose-blush-princess-tulle-party-frock'
+ * @param {string} routeOrPath - e.g. '', '#category/girls', '/category/girls', '#product/rose-blush-princess-tulle-party-frock'
  * @returns {string} The active canonical URL
  */
 export function setCanonicalUrl(routeOrPath = "") {
