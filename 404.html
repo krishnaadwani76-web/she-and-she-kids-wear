@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>She &amp; She Kids Wear - Loading Outfit...</title>
+  <script type="text/javascript">
+    // Single Page Apps for GitHub Pages
+    // MIT License - https://github.com/rafgraph/spa-github-pages
+    // Keeps 1 path segment: "she-and-she-kids-wear"
+    var pathSegmentsToKeep = 1;
+    var l = window.location;
+    var cleanPath = l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/');
+    var route = l.pathname.split('/').slice(1 + pathSegmentsToKeep).join('/').replace(/&/g, '~and~');
+    var query = (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '');
+
+    l.replace(
+      l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+      cleanPath + '/?/' + route + query + l.hash
+    );
+  </script>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding: 40px; background: #FDF2F8; color: #831843;">
+  <h2>She &amp; She Kids Wear</h2>
+  <p>Loading your selected kidswear outfit...</p>
+</body>
+</html>

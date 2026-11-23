@@ -1,5 +1,5 @@
 # Robots.txt for She & She Kids Wear
-# Website: https://sheandshekidswear.com
+# Website: https://krishnaadwani76-web.github.io/she-and-she-kids-wear
 # Store Location: Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan - 324009
 
 User-agent: *
@@ -28,4 +28,4 @@ Disallow: /*?*gclid=
 Crawl-delay: 1
 
 # Official XML Sitemap Location
-Sitemap: https://sheandshekidswear.com/sitemap.xml
+Sitemap: https://krishnaadwani76-web.github.io/she-and-she-kids-wear/sitemap.xml

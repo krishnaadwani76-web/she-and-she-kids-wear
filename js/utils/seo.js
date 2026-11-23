@@ -1,15 +1,38 @@
 /**
  * SEO & Canonical URL Manager for She & She Kids Wear
- * Enforces production canonical domain (https://sheandshekidswear.com),
- * guarantees a single canonical tag in <head>, generates dynamic slug-based
- * product canonical URLs, and strips tracking parameters (UTM, fbclid, etc.).
+ * Supports live GitHub Pages deployment and custom domains automatically.
+ * Guarantees a single canonical tag in <head>, dynamic product slugs,
+ * and strips tracking parameters (UTM, fbclid, etc.).
  */
 
-export const PRODUCTION_DOMAIN = "https://sheandshekidswear.com";
+export const GITHUB_PAGES_BASE = "https://krishnaadwani76-web.github.io/she-and-she-kids-wear";
+export const CUSTOM_DOMAIN_BASE = "https://sheandshekidswear.com";
+
+/**
+ * Resolves the active base URL dynamically:
+ * - On GitHub Pages: https://krishnaadwani76-web.github.io/she-and-she-kids-wear
+ * - On custom domain (e.g. sheandshekidswear.com): uses that custom origin
+ */
+export function getActiveBaseUrl() {
+  if (typeof window !== "undefined" && window.location) {
+    const hostname = window.location.hostname;
+    const origin = window.location.origin;
+
+    if (hostname.endsWith("github.io")) {
+      const parts = window.location.pathname.split("/").filter(Boolean);
+      const repo = parts.length > 0 ? parts[0] : "she-and-she-kids-wear";
+      return `${origin}/${repo}`;
+    }
+
+    if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+      return origin;
+    }
+  }
+  return GITHUB_PAGES_BASE;
+}
 
 /**
  * Clean any tracking parameters (UTMs, fbclid, gclid, etc.) and arbitrary queries from a path/hash
- * Normalizes routes into clean canonical paths (e.g., #category/girls -> /category/girls).
  * @param {string} inputPath
  * @returns {string} Clean canonical path
  */
@@ -18,31 +41,30 @@ export function sanitizeCanonicalPath(inputPath = "") {
     return "";
   }
 
-  // Remove full origin if passed inadvertently (e.g. localhost, github.io, preview URL)
+  // Remove full origin if passed inadvertently
   let path = inputPath;
   try {
     if (path.startsWith("http://") || path.startsWith("https://")) {
       const parsed = new URL(path);
       path = parsed.pathname + parsed.search + parsed.hash;
     }
-  } catch (e) {
-    // Keep path as is if parse fails
-  }
+  } catch (e) { }
 
   // Separate hash and search queries
   let [beforeHash, hashPart] = path.includes("#") ? path.split("#") : [path, ""];
 
-  // Clean beforeHash of query strings (e.g. ?utm_source=...)
   if (beforeHash.includes("?")) {
     beforeHash = beforeHash.split("?")[0];
   }
 
-  // Clean hashPart of query strings (e.g. #category/girls?utm_source=fb)
   if (hashPart && hashPart.includes("?")) {
     hashPart = hashPart.split("?")[0];
   }
 
-  // Choose the active route part (hash takes priority for in-page navigation)
+  // Strip repository prefix if present in beforeHash (e.g. /she-and-she-kids-wear/...)
+  beforeHash = beforeHash.replace(/^\/she-and-she-kids-wear\/?/, "");
+
+  // Choose the active route part
   let cleanRoute = hashPart || beforeHash || "";
   cleanRoute = cleanRoute.replace(/^#/, "").trim();
 
@@ -60,16 +82,17 @@ export function sanitizeCanonicalPath(inputPath = "") {
 }
 
 /**
- * Builds an absolute HTTPS canonical URL on the live production domain
+ * Builds an absolute HTTPS canonical URL on the active live domain
  * @param {string} routeOrPath
  * @returns {string} Absolute HTTPS canonical URL
  */
 export function buildCanonicalUrl(routeOrPath = "") {
+  const base = getActiveBaseUrl();
   const clean = sanitizeCanonicalPath(routeOrPath);
   if (!clean || clean === "/") {
-    return `${PRODUCTION_DOMAIN}/`;
+    return `${base}/`;
   }
-  return `${PRODUCTION_DOMAIN}${clean.startsWith("/") ? clean : "/" + clean}`;
+  return `${base}${clean.startsWith("/") ? clean : "/" + clean}`;
 }
 
 /**
@@ -77,7 +100,7 @@ export function buildCanonicalUrl(routeOrPath = "") {
  * Guarantees exactly ONE canonical tag exists in <head>.
  * Also updates Open Graph <meta property="og:url"> for SEO/social consistency.
  *
- * @param {string} routeOrPath - e.g. '', '#category/girls', '/category/girls', '#product/rose-blush-princess-tulle-party-frock'
+ * @param {string} routeOrPath - e.g. '', '/category/girls', '/product/rose-blush-princess-tulle-party-frock'
  * @returns {string} The active canonical URL
  */
 export function setCanonicalUrl(routeOrPath = "") {
