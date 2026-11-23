@@ -34,7 +34,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 12 Years",
     comfortAndStyling: "Designed with a seamless soft-stitched inner bodice so your little angel enjoys itchy-free celebrations. Features delicate flower-corsage embellishments and an adjustable satin tie-back sash for a royal tailored fit.",
     washingInstructions: "Dry clean recommended for first wash. Thereafter gentle hand wash in lukewarm water. Do not wring or tumble dry. Steam iron on low setting.",
-    description: "Make her birthday and festive memories sparkle with the Rose Blush Princess Tulle Frock from She & She Kids Wear. Handcrafted with airy, voluminous layers of pastel tulle over breathable Indian cotton lining, this fairy-tale dress gives effortless twirl-factor without compromising comfort."
+    description: "Make her birthday and festive memories sparkle with the Rose Blush Princess Tulle Frock from She & She Kids Wear. Handcrafted with airy, voluminous layers of pastel tulle over breathable Indian cotton lining, this fairy-tale dress gives effortless twirl-factor without compromising comfort.",
+    seoTitle: "Rose Blush Princess Tulle Party Frock | Girls Wear Kota",
+    seoDescription: "Buy Rose Blush Princess Tulle Party Frock at She & She Kids Wear Kota. Voluminous pastel layers with 100% hypoallergenic cotton lining for birthday twirls.",
+    seoKeywords: "princess tulle frock, girls birthday dress, party frock Kota, pink tulle dress kids"
   },
   {
     id: "prod_002",
@@ -66,7 +69,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "2 to 16 Years",
     comfortAndStyling: "Tailored to modern festive elegance with mandarin collar, antiqued metallic buttons, and a comfortable elasticated drawstring churidar pajama that stays comfy during long wedding rituals.",
     washingInstructions: "Gentle machine wash or hand wash in cold water with mild detergent. Wash dark colors separately. Iron at medium temperature.",
-    description: "Dress your young prince in effortless royal charm. This 3-piece ethnic ensemble from She & She Kids Wear Dadabari combines refreshing mint cotton tones with a regal floral woven jacket, striking the perfect balance between traditional heritage and all-day play comfort."
+    description: "Dress your young prince in effortless royal charm. This 3-piece ethnic ensemble from She & She Kids Wear Dadabari combines refreshing mint cotton tones with a regal floral woven jacket, striking the perfect balance between traditional heritage and all-day play comfort.",
+    seoTitle: "Pastel Mint Kurta Pajama with Floral Jacket | Boys Wear",
+    seoDescription: "Shop boys pastel mint kurta pajama set with floral woven Nehru jacket at She & She Kids Wear Kota. Pure Chanderi cotton tailored for festive celebrations.",
+    seoKeywords: "boys kurta pajama, floral nehru jacket, festive ethnic wear boys, boys traditional dress"
   },
   {
     id: "prod_003",
@@ -98,7 +104,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "0 to 3 Years",
     comfortAndStyling: "Ultra-breathable open-weave cotton that softens with every wash. Designed with coconut wood buttons and easy-snap crotch buttons for rapid, tear-free diaper changes.",
     washingInstructions: "Machine wash cold on delicate cycle. Air dry flat. Do not bleach. No ironing necessary - the natural muslin crinkle adds texture.",
-    description: "Gently wrapping your newborn in cloud-like gentleness, our Organic Muslin Baby Romper comes paired with a matching sun bonnet. Hand-stitched with love in Rajasthan for ultra-sensitive newborn skin."
+    description: "Gently wrapping your newborn in cloud-like gentleness, our Organic Muslin Baby Romper comes paired with a matching sun bonnet. Hand-stitched with love in Rajasthan for ultra-sensitive newborn skin.",
+    seoTitle: "Organic Muslin Baby Romper & Bonnet Set | Kota Baby Wear",
+    seoDescription: "Order GOTS certified organic muslin baby romper and sun bonnet set at She & She Kids Wear. Ultra-breathable, gentle on sensitive skin, with snap buttons.",
+    seoKeywords: "organic muslin romper, baby bonnet set, newborn organic clothes, soft baby wear Kota"
   },
   {
     id: "prod_004",
@@ -130,7 +139,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "2 to 16 Years",
     comfortAndStyling: "Kalidar 32-kali flare that swirls like magic. Decorated with traditional golden Rajasthani gota work along hemline and sleeves, finished with a feather-light net dupatta.",
     washingInstructions: "Hand wash gently with mild liquid soap. Do not soak. Shade dry. Warm iron inside out.",
-    description: "Bring radiant festive cheer to your daughter's wardrobe with our Marigold Anarkali set. Made from heritage Kota-inspired mulmul cotton, it keeps little girls comfortable throughout Diwali, Eid, Haldi, or wedding celebrations."
+    description: "Bring radiant festive cheer to your daughter's wardrobe with our Marigold Anarkali set. Made from heritage Kota-inspired mulmul cotton, it keeps little girls comfortable throughout Diwali, Eid, Haldi, or wedding celebrations.",
+    seoTitle: "Sunshine Yellow Floral Anarkali Kurta Set | Girls Ethnic",
+    seoDescription: "Shop sunshine yellow floral anarkali kurta set with dupatta at She & She Kids Wear Kota. Pure mulmul cotton with Gota Patti detailing for festive joy.",
+    seoKeywords: "yellow anarkali kids, girls festive kurta set, gota patti dress kids, Indian ethnic wear girls"
   },
   {
     id: "prod_005",
@@ -162,7 +174,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 12 Years",
     comfortAndStyling: "Tailored collar with wooden button placket and roll-up sleeve tabs. Comes with stretchable waistband chinos with internal button adjusters for easy growth fits.",
     washingInstructions: "Machine wash cold, cycle normal. Tumble dry low or line dry. Warm iron while slightly damp for crisp linen drape.",
-    description: "Effortlessly dapper for weekend brunches, family holidays, and birthday outings. This lightweight linen-cotton duo keeps young boys sharp and sweat-free under warm Indian afternoons."
+    description: "Effortlessly dapper for weekend brunches, family holidays, and birthday outings. This lightweight linen-cotton duo keeps young boys sharp and sweat-free under warm Indian afternoons.",
+    seoTitle: "Linen Chambray Shirt & Chino Shorts Set | Boys Casual",
+    seoDescription: "Buy boys classic linen chambray shirt and chino shorts combo at She & She Kids Wear Dadabari. Breathable European linen blend tailored for summer outings.",
+    seoKeywords: "boys linen shirt, chino shorts set, summer boys casual, boys stylish outfits Kota"
   },
   {
     id: "prod_006",
@@ -194,7 +209,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 14 Years",
     comfortAndStyling: "Charming flutter sleeves, square neckline with elasticated back, and a three-tier airy silhouette that moves gracefully with active little girls.",
     washingInstructions: "Machine wash gentle in cold water. Wash with like colors. Line dry in shade.",
-    description: "Everyday luxury for your little fashionista. Our Lavender Flutter Dress combines dreamy pastel shades with pure cotton comfort, making it a go-to choice for school picnics, playdates, and dinner parties."
+    description: "Everyday luxury for your little fashionista. Our Lavender Flutter Dress combines dreamy pastel shades with pure cotton comfort, making it a go-to choice for school picnics, playdates, and dinner parties.",
+    seoTitle: "Lavender Flutter Sleeve Tiered Dress | Girls Cotton Frock",
+    seoDescription: "Explore pastel lavender flutter sleeve tiered cotton dress for girls at She & She Kids Wear Kota. Airy poplin cotton with dobby texture for all-day comfort.",
+    seoKeywords: "girls tiered dress, lavender cotton frock, flutter sleeve dress kids, casual girls wear"
   },
   {
     id: "prod_007",
@@ -226,7 +244,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "3 to 16 Years",
     comfortAndStyling: "Features tailored satin-trimmed pocket square, bespoke crest brass buttons, and a removable satin bowtie. Tailored with room for easy movement on the dance floor.",
     washingInstructions: "Specialist dry clean only. Store in garment bag with cedar balls.",
-    description: "A show-stopping red carpet tuxedo for weddings and evening galas. Designed specifically for young gentlemen, this plush velvet ensemble radiates timeless sophistication."
+    description: "A show-stopping red carpet tuxedo for weddings and evening galas. Designed specifically for young gentlemen, this plush velvet ensemble radiates timeless sophistication.",
+    seoTitle: "Royal Navy Bandhgala Velvet Tuxedo Set | Boys Suits Kota",
+    seoDescription: "Tailored 3-piece royal navy velvet bandhgala tuxedo for young boys at She & She Kids Wear. Satin lapel blazer, cotton shirt, and trousers for weddings.",
+    seoKeywords: "boys velvet tuxedo, bandhgala suit kids, boys wedding suit Kota, royal navy tuxedo boys"
   },
   {
     id: "prod_008",
@@ -258,7 +279,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "2 to 16 Years",
     comfortAndStyling: "Features a soft-lined choli with back hook closure, can-can mesh skirt insert for dreamy twirl volume, handmade potli bag, and pure organza ruffled dupatta.",
     washingInstructions: "Dry clean only to maintain brocade weave luster.",
-    description: "Directly inspired by royal Indian palaces, this peach and gold lehenga choli set turns every young girl into a princess. Fully lined in soft cotton to ensure she can dance all night without irritation."
+    description: "Directly inspired by royal Indian palaces, this peach and gold lehenga choli set turns every young girl into a princess. Fully lined in soft cotton to ensure she can dance all night without irritation.",
+    seoTitle: "Peach Floral Brocade Lehenga Choli Set | Girls Ethnic",
+    seoDescription: "Buy royal Banarasi silk brocade lehenga choli set with organza dupatta at She & She Kids Wear Kota. Pure cotton can-can lining for twirls without irritation.",
+    seoKeywords: "kids lehenga choli, banarasi brocade kids lehenga, girls bridal wear, ethnic gown kids"
   },
   {
     id: "prod_009",
@@ -290,7 +314,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 4 Years",
     comfortAndStyling: "Two-way safety zip with chin guard protector. Built-in fold-over scratch mittens for toddlers and slip-resistant silicone foot grips.",
     washingInstructions: "Machine wash warm (40°C). Tumble dry medium. Safe for daily baby laundering.",
-    description: "Ensure snuggly, uninterrupted sleep for your precious little one. Made with extra-soft combed cotton, these adorable sleepsuits are pediatrician-approved and chemical-free."
+    description: "Ensure snuggly, uninterrupted sleep for your precious little one. Made with extra-soft combed cotton, these adorable sleepsuits are pediatrician-approved and chemical-free.",
+    seoTitle: "Pastel Striped Cotton Baby Sleepsuit Set | She & She",
+    seoDescription: "Shop 2-pack combed interlock cotton baby sleepsuits at She & She Kids Wear Kota. Features two-way safety zipper, chin guard, and non-slip silicone foot grips.",
+    seoKeywords: "baby sleepsuit pack, cotton baby onesie, infant nightwear Kota, newborn zip sleepsuit"
   },
   {
     id: "prod_010",
@@ -322,7 +349,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 8 Years",
     comfortAndStyling: "Adjustable buckle shoulder straps that grow with your child, functional front kangaroo pouch pocket, and snap crotch on toddler sizes.",
     washingInstructions: "Machine wash cold inside out. Tumble dry normal.",
-    description: "Ready for playground climbs, park strolls, and nursery days. The Safari Dungaree set is rugged, fashionable, and ultra-durable for energetic boys."
+    description: "Ready for playground climbs, park strolls, and nursery days. The Safari Dungaree set is rugged, fashionable, and ultra-durable for energetic boys.",
+    seoTitle: "Safari Explorer Cotton Dungaree & Tee Set | Boys Casual",
+    seoDescription: "Order rugged 100% twill cotton dungaree and striped jersey t-shirt set at She & She Kids Wear Kota. Adjustable straps and kangaroo pockets for play days.",
+    seoKeywords: "boys cotton dungaree, kids overalls set, boys playwear, toddler dungaree Kota"
   },
   {
     id: "prod_011",
@@ -354,7 +384,10 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "2 to 14 Years",
     comfortAndStyling: "Thread-embroidered mirror motifs with tassel tie-up dori. Flowing dhoti pants with soft elastic waist ensure total comfort while sitting cross-legged during pujas.",
     washingInstructions: "Gentle hand wash with cold water. Line dry in shade.",
-    description: "An Indo-Western classic! This peplum kurti and dhoti pant set brings contemporary festival flair to your young daughter's ethnic closet."
+    description: "An Indo-Western classic! This peplum kurti and dhoti pant set brings contemporary festival flair to your young daughter's ethnic closet.",
+    seoTitle: "Embroidered Peplum Kurti & Dhoti Pant Set | Girls Wear",
+    seoDescription: "Shop stylish mirror-work peplum kurti and soft dhoti pant set at She & She Kids Wear Kota. Pure cotton lined festive Indo-Western wear for girls ages 2-14.",
+    seoKeywords: "peplum kurti dhoti set, girls indo western, mirror work kidswear, festive ethnic girls"
   },
   {
     id: "prod_012",
@@ -386,7 +419,11 @@ export const INITIAL_PRODUCTS = [
     ageGroup: "1 to 10 Years",
     comfortAndStyling: "Adorned with 3D teddy ears on the hood, ribbed storm cuffs to seal out cold drafts, and a smooth nylon zipper with protective chin garage.",
     washingInstructions: "Machine wash cold gentle cycle. Do not iron fleece directly.",
-    description: "Wrap your little ones in irresistible cozy comfort with our Sherpa Bear track set. Perfect for Kota's winter mornings and holiday travels."
+    description: "Wrap your little ones in irresistible cozy comfort with our Sherpa Bear track set. Perfect for Kota's winter mornings and holiday travels.",
+    seoTitle: "Cozy Bear Fleece Hooded Jacket & Joggers | Kids Winter",
+    seoDescription: "Keep your little ones warm with ultra-soft Sherpa bear fleece hooded jacket and joggers set from She & She Kids Wear Kota. 100% jersey cotton inner lining.",
+    seoKeywords: "kids winter fleece set, bear hooded jacket kids, cozy track set kids, winter kidswear Kota"
+  }
   }
 ];
 

@@ -9,7 +9,7 @@ import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js";
 import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js";
 import { showToast } from "./utils/toast.js";
 import { initiateRazorpayPayment } from "./utils/razorpay.js";
-import { setCanonicalUrl } from "./utils/seo.js";
+import { setCanonicalUrl, applyRouteMetadata, applyProductMetadata } from "./utils/seo.js";
 
 // Components
 import { renderHeader } from "./components/header.js";
@@ -640,31 +640,31 @@ function handleHashChange() {
   if (hash.startsWith("#category/")) {
     const cat = hash.replace("#category/", "");
     setCategory(cat, false);
-    setCanonicalUrl(`/category/${cat}`);
+    applyRouteMetadata(`category/${cat}`);
     scrollToSection("catalog-section");
   } else if (hash === "#new-arrivals") {
     setCategory("new", false);
-    setCanonicalUrl("/category/new");
+    applyRouteMetadata("category/new");
     scrollToSection("catalog-section");
   } else if (hash === "#best-sellers") {
     setCategory("bestsellers", false);
-    setCanonicalUrl("/category/bestsellers");
+    applyRouteMetadata("category/bestsellers");
     scrollToSection("catalog-section");
   } else if (hash.startsWith("#product/")) {
     const prodIdOrSlug = hash.replace("#product/", "");
     openProductModal(prodIdOrSlug);
   } else if (hash === "#track-order") {
-    setCanonicalUrl("/track-order");
+    applyRouteMetadata("track-order");
     openTrackingModal();
   } else if (hash === "#size-guide") {
-    setCanonicalUrl("/size-guide");
+    applyRouteMetadata("size-guide");
     const p = db.getProducts()[0];
     if (p) openProductModal(p.id);
   } else if (hash === "#contact") {
-    setCanonicalUrl("/contact");
+    applyRouteMetadata("contact");
     scrollToSection("contact");
   } else if (hash === "#about") {
-    setCanonicalUrl("/about");
+    applyRouteMetadata("about");
     scrollToSection("contact");
   } else if (hash === "#admin" || hash === "#admin-login") {
     setCanonicalUrl("admin.html");
@@ -675,7 +675,7 @@ function handleHashChange() {
     }
   } else {
     // Default Home
-    setCanonicalUrl("/");
+    applyRouteMetadata("home");
   }
 }
 
@@ -692,12 +692,12 @@ function setCategory(catId, updateUrl = true) {
   renderProductGrid();
 
   if (catId === "all") {
-    setCanonicalUrl("/");
+    applyRouteMetadata("home");
     if (updateUrl && window.location.hash.startsWith("#category/")) {
       window.history.replaceState(null, "", "#home");
     }
   } else {
-    setCanonicalUrl(`/category/${catId}`);
+    applyRouteMetadata(`category/${catId}`);
     if (updateUrl) {
       window.history.replaceState(null, "", `#category/${catId}`);
     }
@@ -759,7 +759,7 @@ function openProductModal(productIdOrSlug) {
   if (!product) return;
 
   const productSlug = product.slug || product.id;
-  setCanonicalUrl(`/product/${productSlug}`);
+  applyProductMetadata(product);
   if (window.location.hash !== `#product/${productSlug}`) {
     window.history.replaceState(null, "", `#product/${productSlug}`);
   }
@@ -888,9 +888,9 @@ function openProductModal(productIdOrSlug) {
       window.history.replaceState(null, "", targetHash);
     }
     if (state.currentCategory && state.currentCategory !== "all") {
-      setCanonicalUrl(`/category/${state.currentCategory}`);
+      applyRouteMetadata(`category/${state.currentCategory}`);
     } else {
-      setCanonicalUrl("/");
+      applyRouteMetadata("home");
     }
   }
 }
@@ -1076,7 +1076,7 @@ function openCheckoutModal() {
 }
 
 function openTrackingModal(prefilledOrderId = "") {
-  setCanonicalUrl("/track-order");
+  applyRouteMetadata("track-order");
   if (window.location.hash !== "#track-order") {
     window.history.replaceState(null, "", "#track-order");
   }
@@ -1100,9 +1100,9 @@ function openTrackingModal(prefilledOrderId = "") {
       window.history.replaceState(null, "", targetHash);
     }
     if (state.currentCategory && state.currentCategory !== "all") {
-      setCanonicalUrl(`/category/${state.currentCategory}`);
+      applyRouteMetadata(`category/${state.currentCategory}`);
     } else {
-      setCanonicalUrl("/");
+      applyRouteMetadata("home");
     }
   };
 
