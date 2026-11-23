@@ -424,7 +424,6 @@ export const INITIAL_PRODUCTS = [
     seoDescription: "Keep your little ones warm with ultra-soft Sherpa bear fleece hooded jacket and joggers set from She & She Kids Wear Kota. 100% jersey cotton inner lining.",
     seoKeywords: "kids winter fleece set, bear hooded jacket kids, cozy track set kids, winter kidswear Kota"
   }
-  }
 ];
 
 export const CATEGORIES = [
