@@ -207,13 +207,13 @@ function setupShellListeners() {
   }
 }
 
-function renderActiveTab() {
+async function renderActiveTab() {
   const container = document.getElementById("admin-main-body");
   if (!container) return;
 
   switch (adminState.activeTab) {
     case "dashboard":
-      renderDashboardTab(container);
+      await renderDashboardTab(container);
       break;
     case "products":
       renderProductsTab(container);
@@ -222,7 +222,7 @@ function renderActiveTab() {
       renderCategoriesTab(container);
       break;
     case "orders":
-      renderOrdersTab(container);
+      await renderOrdersTab(container);
       break;
     case "content":
       renderContentTab(container);
@@ -328,26 +328,51 @@ function setupLoginListeners() {
 /* ==========================================================================
    2. DASHBOARD OVERVIEW TAB
    ========================================================================== */
-function renderDashboardTab(container) {
-  const products = db.getProducts();
-  const orders = db.getOrders();
+async function renderDashboardTab(container) {
+  const orders = await db.getOrdersAsync();
+  const products = await db.getProductsAsync();
   const categories = db.getCategories();
-  const inquiries = db.getInquiries();
+  const inquiries = await db.getInquiriesAsync();
   const subscribers = db.getNewsletterSubscribers();
   const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const pendingOrders = orders.filter(o => o.orderStatus === "Pending" || o.orderStatus === "Processing");
   const lowStockProducts = products.filter(p => Number(p.stock) < 5);
+  const isCloudConnected = isSupabaseConfigured();
 
   container.innerHTML = `
     <div class="space-y-6">
       
+      <!-- Real Database Status Indicator Banner -->
+      ${!isCloudConnected ? `
+        <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-200">
+          <div class="flex items-center gap-2.5">
+            <span class="text-base">⚠️</span>
+            <div>
+              <div class="font-bold text-amber-300">Cloud Database Not Connected</div>
+              <div class="text-[11px] text-amber-400/80">Currently operating in browser local storage. Orders placed on this device are saved locally. Connect your Supabase project to sync orders across all devices.</div>
+            </div>
+          </div>
+          <button id="dash-connect-db-banner-btn" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shrink-0 transition">
+            Configure Supabase Database →
+          </button>
+        </div>
+      ` : `
+        <div class="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between text-xs text-emerald-300">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Connected to <strong>Supabase Cloud PostgreSQL</strong>. Displaying live production database records.</span>
+          </div>
+          <span class="text-[11px] text-emerald-400 font-bold bg-emerald-900/50 px-2 py-0.5 rounded-full">Cloud Active</span>
+        </div>
+      `}
+
       <!-- Metrics Overview Cards -->
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         
         <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md">
           <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Sales</div>
           <div class="text-2xl font-black text-rose-400 font-serif mt-1.5">${formatCurrency(totalSales)}</div>
-          <div class="text-[11px] text-slate-400 mt-1">${orders.length} orders total</div>
+          <div class="text-[11px] text-slate-400 mt-1">${orders.length} real orders total</div>
         </div>
 
         <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md">
@@ -454,7 +479,12 @@ function renderDashboardTab(container) {
               `).join("")}
               ${orders.length === 0 ? `
                 <tr>
-                  <td colspan="7" class="px-6 py-8 text-center text-slate-500">No orders received yet.</td>
+                  <td colspan="7" class="px-6 py-10 text-center text-slate-500">
+                    <div class="space-y-1.5 py-3">
+                      <div class="text-sm font-semibold text-slate-300">No customer orders found in database</div>
+                      <div class="text-xs text-slate-500">All demo data has been purged. When real customers complete checkout, their orders and payment receipts will appear here in real time.</div>
+                    </div>
+                  </td>
                 </tr>
               ` : ""}
             </tbody>
@@ -512,6 +542,10 @@ function renderDashboardTab(container) {
   `;
 
   // Listeners
+  document.getElementById("dash-connect-db-banner-btn")?.addEventListener("click", () => {
+    adminState.activeTab = "database";
+    renderAdminShell();
+  });
   document.getElementById("dash-add-product")?.addEventListener("click", () => openProductModal());
   document.getElementById("dash-view-orders")?.addEventListener("click", () => {
     adminState.activeTab = "orders";
@@ -815,8 +849,9 @@ function renderCategoriesTab(container) {
 /* ==========================================================================
    5. ORDERS TAB
    ========================================================================== */
-function renderOrdersTab(container) {
-  const orders = db.getOrders();
+async function renderOrdersTab(container) {
+  const orders = await db.getOrdersAsync();
+  const isCloudConnected = isSupabaseConfigured();
 
   const filtered = orders.filter(o => {
     const matchesStatus = adminState.orderStatusFilter === "all" || o.orderStatus === adminState.orderStatusFilter;
@@ -832,6 +867,30 @@ function renderOrdersTab(container) {
   container.innerHTML = `
     <div class="space-y-6">
       
+      <!-- Database Connection Status Badge -->
+      ${!isCloudConnected ? `
+        <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-200">
+          <div class="flex items-center gap-2.5">
+            <span class="text-base">⚠️</span>
+            <div>
+              <div class="font-bold text-amber-300">Cloud Database Not Connected</div>
+              <div class="text-[11px] text-amber-400/80">Orders are currently saved in browser local storage only. Connect Supabase in the Database tab to sync orders centrally across devices.</div>
+            </div>
+          </div>
+          <button id="orders-connect-db-btn" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shrink-0 transition">
+            Configure Supabase Database →
+          </button>
+        </div>
+      ` : `
+        <div class="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 flex items-center justify-between text-xs text-emerald-300">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Real-time orders connected to <strong>Supabase Cloud PostgreSQL</strong> (${orders.length} real orders).</span>
+          </div>
+          <span class="text-[11px] text-emerald-400 font-bold bg-emerald-900/50 px-2 py-0.5 rounded-full">Live Database</span>
+        </div>
+      `}
+
       <!-- Filter Bar -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
         <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1">
@@ -927,7 +986,14 @@ function renderOrdersTab(container) {
               ${filtered.length === 0 ? `
                 <tr>
                   <td colspan="7" class="px-6 py-12 text-center text-slate-500">
-                    No orders found matching the filter.
+                    <div class="space-y-1.5 py-3">
+                      <div class="text-sm font-semibold text-slate-300">
+                        ${orders.length === 0 ? 'No customer orders recorded in database' : 'No orders found matching the filter'}
+                      </div>
+                      <div class="text-xs text-slate-500">
+                        ${orders.length === 0 ? 'All demo orders have been purged. When customers checkout on your website, real orders and payments will appear here in real time.' : 'Try changing your status filter or clearing your search term.'}
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ` : ""}
@@ -940,6 +1006,10 @@ function renderOrdersTab(container) {
   `;
 
   // Listeners
+  document.getElementById("orders-connect-db-btn")?.addEventListener("click", () => {
+    adminState.activeTab = "database";
+    renderAdminShell();
+  });
   container.querySelectorAll(".order-filter-pill").forEach(btn => {
     btn.addEventListener("click", (e) => {
       adminState.orderStatusFilter = e.currentTarget.dataset.status;
@@ -2012,8 +2082,11 @@ function openCategoryModal(categoryId = null) {
 /* ==========================================================================
    10. ORDER DETAILS & DISPATCH MODAL
    ========================================================================== */
-function openOrderModal(orderId) {
-  const order = db.getOrderById(orderId);
+async function openOrderModal(orderId) {
+  let order = db.getOrderById(orderId);
+  if (!order) {
+    order = await db.getOrderByIdAsync(orderId);
+  }
   if (!order) return;
 
   const modalContainer = document.getElementById("admin-modal-container");

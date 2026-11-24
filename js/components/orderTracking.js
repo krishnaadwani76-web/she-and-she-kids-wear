@@ -1,6 +1,6 @@
 /**
  * Order Tracking Component
- * Allows customers to track their order live using Order ID (e.g., SSKW-84920)
+ * Allows customers to track their order live using Order ID (e.g., SSKW-10482)
  * or mobile number, with interactive timeline and courier details.
  */
 
@@ -35,7 +35,7 @@ export function renderOrderTrackingModal(initialOrderId = "") {
               <input
                 id="tracking-search-input"
                 type="text"
-                placeholder="e.g. SSKW-84920 or 8824844263"
+                placeholder="e.g. SSKW-10482 or 8824844263"
                 value="${initialOrderId}"
                 class="flex-1 px-4 py-3 rounded-2xl border border-rose-200 text-sm font-semibold uppercase bg-white focus:outline-none focus:ring-2 focus:ring-rose-400"
               />
@@ -47,7 +47,7 @@ export function renderOrderTrackingModal(initialOrderId = "") {
               </button>
             </div>
             <p class="text-[11px] text-slate-400">
-              Demo sample Order IDs you can test: <strong class="text-rose-600 cursor-pointer sample-track-id">SSKW-84920</strong> or <strong class="text-rose-600 cursor-pointer sample-track-id">SSKW-78219</strong>
+              Enter your real Order ID from your confirmation receipt or the 10-digit phone number entered during checkout.
             </p>
           </div>
 

@@ -537,69 +537,12 @@ ON CONFLICT (key) DO UPDATE SET
     value = EXCLUDED.value;
 
 -- ============================================================================
--- 12. SEED DATA: SAMPLE ORDERS & CUSTOMERS
+-- 12. CLEANUP OF LEGACY DEMO ORDERS & SAMPLE CUSTOMERS
 -- ============================================================================
-INSERT INTO public.customers (id, name, email, phone, address, city, state, pincode, orders_count, total_spent)
-VALUES
-    ('cust_01', 'Pooja Sharma', 'pooja.sharma@example.com', '9829154321', 'House 12, Talwandi', 'Kota', 'Rajasthan', '324005', 1, 1599.00),
-    ('cust_02', 'Amitabh Verma', 'amitabh.v@example.com', '9414012345', 'Flat 402, Royal Residency, Dadabari', 'Kota', 'Rajasthan', '324009', 1, 1899.00)
-ON CONFLICT (phone) DO NOTHING;
-
-INSERT INTO public.orders (
-    id, customer_name, customer_email, customer_phone, customer_address,
-    customer_city, customer_state, customer_pincode, subtotal, discount,
-    shipping, total, payment_method, payment_status, payment_id, order_status,
-    courier, tracking_number, tracking_link
-) VALUES
-(
-    'SSKW-78219',
-    'Pooja Sharma',
-    'pooja.sharma@example.com',
-    '9829154321',
-    'House 12, Talwandi',
-    'Kota',
-    'Rajasthan',
-    '324005',
-    1599.00,
-    0.00,
-    0.00,
-    1599.00,
-    'Razorpay (UPI)',
-    'Paid',
-    'pay_sample_test_01',
-    'Delivered',
-    'Delhivery Express Kota',
-    'DL-90823412',
-    'https://www.delhivery.com/track/package/DL-90823412'
-),
-(
-    'SSKW-84920',
-    'Amitabh Verma',
-    'amitabh.v@example.com',
-    '9414012345',
-    'Flat 402, Royal Residency, Dadabari',
-    'Kota',
-    'Rajasthan',
-    '324009',
-    1899.00,
-    0.00,
-    0.00,
-    1899.00,
-    'Cash on Delivery (COD)',
-    'Pending on Delivery',
-    'pay_cod_sample_02',
-    'Processing',
-    'BlueDart KidCare Kota',
-    'BD-84920391',
-    'https://www.bluedart.com/tracking'
-)
-ON CONFLICT (id) DO NOTHING;
-
-INSERT INTO public.order_items (order_id, product_id, name, price, quantity, size, color, image)
-VALUES
-    ('SSKW-78219', 'prod_001', 'Rose Blush Princess Tulle Party Frock', 1599.00, 1, '4-5Y', 'Blush Pink', 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=400&q=80'),
-    ('SSKW-84920', 'prod_002', 'Pastel Mint Kurta Pajama with Floral Nehru Jacket', 1899.00, 1, '5-6Y', 'Mint Green', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=400&q=80')
-ON CONFLICT DO NOTHING;
+-- Ensures the production database contains only real customer orders and genuine clients
+DELETE FROM public.order_items WHERE order_id IN ('SSKW-78219', 'SSKW-84920');
+DELETE FROM public.orders WHERE id IN ('SSKW-78219', 'SSKW-84920');
+DELETE FROM public.customers WHERE id IN ('cust_01', 'cust_02') OR phone IN ('9829154321', '9414012345');
 
 -- ============================================================================
 -- 13. CUSTOMER INQUIRIES & CONTACT MESSAGES

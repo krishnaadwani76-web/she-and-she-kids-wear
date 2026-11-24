@@ -71,109 +71,14 @@ class StoreDB {
       localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(seeded));
     }
 
-    // 3. Initialize Orders
+    // 3. Initialize Orders (Clean empty state - real orders populated strictly on checkout or cloud sync)
     if (!localStorage.getItem(DB_KEYS.ORDERS)) {
-      const sampleOrders = [
-        {
-          id: "SSKW-78219",
-          createdAt: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
-          customer: {
-            name: "Pooja Sharma",
-            email: "pooja.sharma@example.com",
-            phone: "9829154321",
-            address: "House 12, Talwandi",
-            city: "Kota",
-            state: "Rajasthan",
-            pincode: "324005"
-          },
-          items: [
-            {
-              id: "prod_001",
-              name: "Rose Blush Princess Tulle Party Frock",
-              price: 1599,
-              originalPrice: 2499,
-              size: "4-5Y",
-              color: "Blush Pink",
-              quantity: 1,
-              image: "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=400&q=80"
-            }
-          ],
-          subtotal: 1599,
-          discount: 0,
-          shipping: 0,
-          total: 1599,
-          paymentMethod: "Razorpay (UPI)",
-          paymentStatus: "Paid",
-          paymentId: "pay_test_sample_01",
-          orderStatus: "Delivered",
-          courier: "Delhivery Express Kota",
-          trackingNumber: "DL-90823412",
-          trackingLink: "https://www.delhivery.com/track/package/DL-90823412"
-        },
-        {
-          id: "SSKW-84920",
-          createdAt: new Date(Date.now() - 3600000 * 5).toISOString(),
-          customer: {
-            name: "Amitabh Verma",
-            email: "amitabh.v@example.com",
-            phone: "9414012345",
-            address: "Flat 402, Royal Residency, Dadabari",
-            city: "Kota",
-            state: "Rajasthan",
-            pincode: "324009"
-          },
-          items: [
-            {
-              id: "prod_002",
-              name: "Pastel Mint Kurta Pajama with Floral Nehru Jacket",
-              price: 1899,
-              originalPrice: 2999,
-              size: "5-6Y",
-              color: "Mint Green",
-              quantity: 1,
-              image: "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=400&q=80"
-            }
-          ],
-          subtotal: 1899,
-          discount: 0,
-          shipping: 0,
-          total: 1899,
-          paymentMethod: "Cash on Delivery (COD)",
-          paymentStatus: "Pending on Delivery",
-          orderStatus: "Processing",
-          courier: "BlueDart KidCare Kota",
-          trackingNumber: "BD-84920391",
-          trackingLink: "https://www.bluedart.com/tracking"
-        }
-      ];
-      localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(sampleOrders));
+      localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify([]));
     }
 
-    // 4. Initialize Customers
+    // 4. Initialize Customers (Clean empty state - recorded strictly upon actual purchase)
     if (!localStorage.getItem(DB_KEYS.CUSTOMERS)) {
-      const sampleCustomers = [
-        {
-          id: "cust_1",
-          name: "Pooja Sharma",
-          email: "pooja.sharma@example.com",
-          phone: "9829154321",
-          city: "Kota",
-          ordersCount: 1,
-          totalSpent: 1599,
-          joinedAt: new Date(Date.now() - 3600000 * 24 * 10).toISOString()
-        },
-        {
-          id: "cust_2",
-          name: "Amitabh Verma",
-          email: "amitabh.v@example.com",
-          phone: "9414012345",
-          city: "Kota",
-          ordersCount: 1,
-          totalSpent: 1899,
-          joinedAt: new Date(Date.now() - 3600000 * 24 * 3).toISOString()
-        }
-      ];
-      localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify(sampleCustomers));
+      localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify([]));
     }
 
     // 5. Initialize Cart & Wishlist
@@ -244,6 +149,64 @@ class StoreDB {
     if (!localStorage.getItem(DB_KEYS.NEWSLETTER)) {
       localStorage.setItem(DB_KEYS.NEWSLETTER, JSON.stringify([]));
     }
+
+    // 9. Purge any lingering demo orders or sample customers from previous test sessions
+    this.cleanseDemoData();
+  }
+
+  cleanseDemoData() {
+    try {
+      const demoOrderIds = new Set(["SSKW-78219", "SSKW-84920"]);
+      const demoPhones = new Set(["9829154321", "9414012345"]);
+      const demoEmails = new Set(["pooja.sharma@example.com", "amitabh.v@example.com"]);
+      const demoCustIds = new Set(["cust_1", "cust_2", "cust_01", "cust_02"]);
+
+      // 1. Cleanse localStorage orders
+      const ordersRaw = localStorage.getItem(DB_KEYS.ORDERS);
+      if (ordersRaw) {
+        const orders = JSON.parse(ordersRaw);
+        if (Array.isArray(orders)) {
+          const cleanOrders = orders.filter(
+            (o) =>
+              !demoOrderIds.has(o.id) &&
+              !demoPhones.has(o.customer?.phone) &&
+              !demoEmails.has(o.customer?.email?.toLowerCase())
+          );
+          if (cleanOrders.length !== orders.length) {
+            localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(cleanOrders));
+          }
+        }
+      }
+
+      // 2. Cleanse localStorage customers
+      const custsRaw = localStorage.getItem(DB_KEYS.CUSTOMERS);
+      if (custsRaw) {
+        const custs = JSON.parse(custsRaw);
+        if (Array.isArray(custs)) {
+          const cleanCusts = custs.filter(
+            (c) =>
+              !demoCustIds.has(c.id) &&
+              !demoPhones.has(c.phone) &&
+              !demoEmails.has(c.email?.toLowerCase())
+          );
+          if (cleanCusts.length !== custs.length) {
+            localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify(cleanCusts));
+          }
+        }
+      }
+
+      // 3. If Supabase Cloud is configured, also purge legacy demo orders from cloud database
+      if (isSupabaseConfigured()) {
+        getSupabaseClient().then((client) => {
+          if (!client) return;
+          client.from("order_items").delete().in("order_id", ["SSKW-78219", "SSKW-84920"]).then(() => {});
+          client.from("orders").delete().in("id", ["SSKW-78219", "SSKW-84920"]).then(() => {});
+          client.from("customers").delete().in("phone", ["9829154321", "9414012345"]).then(() => {});
+        }).catch(() => {});
+      }
+    } catch (e) {
+      console.warn("Could not cleanse demo data:", e);
+    }
   }
 
   /* ------------------- SUPABASE CLOUD SYNC ------------------- */
@@ -310,48 +273,44 @@ class StoreDB {
         localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(formattedProds));
       }
 
-      // Sync orders
+      // Sync orders (strictly filter out demo orders, save even if 0 orders in database)
       const { data: orderData, error: orderError } = await client
         .from("orders")
         .select("*, order_items(*)")
         .order("created_at", { ascending: false });
 
-      if (!orderError && orderData && orderData.length > 0) {
-        const formattedOrders = orderData.map(o => ({
-          id: o.id,
-          createdAt: o.created_at,
-          customer: {
-            name: o.customer_name,
-            email: o.customer_email,
-            phone: o.customer_phone,
-            address: o.customer_address,
-            city: o.customer_city,
-            state: o.customer_state,
-            pincode: o.customer_pincode
-          },
-          items: (o.order_items || []).map(item => ({
-            id: item.product_id,
-            name: item.name,
-            price: Number(item.price),
-            quantity: item.quantity,
-            size: item.size,
-            color: item.color,
-            image: item.image
-          })),
-          subtotal: Number(o.subtotal),
-          discount: Number(o.discount || 0),
-          shipping: Number(o.shipping || 0),
-          total: Number(o.total),
-          paymentMethod: o.payment_method,
-          paymentStatus: o.payment_status,
-          paymentId: o.payment_id,
-          orderStatus: o.order_status,
-          courier: o.courier,
-          trackingNumber: o.tracking_number,
-          trackingLink: o.tracking_link,
-          notes: o.notes
-        }));
+      if (!orderError && Array.isArray(orderData)) {
+        const demoOrderIds = new Set(["SSKW-78219", "SSKW-84920"]);
+        const formattedOrders = orderData
+          .filter(o => !demoOrderIds.has(o.id))
+          .map(o => this.formatSupabaseOrder(o));
         localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(formattedOrders));
+      }
+
+      // Sync customers (filter out sample customers)
+      const { data: custData, error: custError } = await client
+        .from("customers")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!custError && Array.isArray(custData)) {
+        const demoPhones = new Set(["9829154321", "9414012345"]);
+        const demoCustIds = new Set(["cust_01", "cust_02", "cust_1", "cust_2"]);
+        const cleanCusts = custData
+          .filter(c => !demoCustIds.has(c.id) && !demoPhones.has(c.phone))
+          .map(c => ({
+            id: c.id,
+            name: c.name,
+            email: c.email || "",
+            phone: c.phone,
+            address: c.address || "",
+            city: c.city || "Kota",
+            pincode: c.pincode || "",
+            ordersCount: c.orders_count || 1,
+            totalSpent: Number(c.total_spent || 0),
+            joinedAt: c.created_at
+          }));
+        localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify(cleanCusts));
       }
 
       // Sync site settings
@@ -840,7 +799,11 @@ class StoreDB {
   /* ------------------- ORDERS API ------------------- */
   getOrders() {
     try {
-      return JSON.parse(localStorage.getItem(DB_KEYS.ORDERS) || "[]");
+      const orders = JSON.parse(localStorage.getItem(DB_KEYS.ORDERS) || "[]");
+      if (Array.isArray(orders)) {
+        return orders.filter(o => o.id !== "SSKW-78219" && o.id !== "SSKW-84920");
+      }
+      return [];
     } catch {
       return [];
     }
@@ -850,48 +813,21 @@ class StoreDB {
     if (isSupabaseConfigured()) {
       const client = await getSupabaseClient();
       if (client) {
-        const { data, error } = await client
-          .from("orders")
-          .select("*, order_items(*)")
-          .order("created_at", { ascending: false });
+        try {
+          const { data, error } = await client
+            .from("orders")
+            .select("*, order_items(*)")
+            .order("created_at", { ascending: false });
 
-        if (!error && data) {
-          const mapped = data.map(o => ({
-            id: o.id,
-            createdAt: o.created_at,
-            customer: {
-              name: o.customer_name,
-              email: o.customer_email,
-              phone: o.customer_phone,
-              address: o.customer_address,
-              city: o.customer_city,
-              state: o.customer_state,
-              pincode: o.customer_pincode
-            },
-            items: (o.order_items || []).map(item => ({
-              id: item.product_id,
-              name: item.name,
-              price: Number(item.price),
-              quantity: item.quantity,
-              size: item.size,
-              color: item.color,
-              image: item.image
-            })),
-            subtotal: Number(o.subtotal),
-            discount: Number(o.discount || 0),
-            shipping: Number(o.shipping || 0),
-            total: Number(o.total),
-            paymentMethod: o.payment_method,
-            paymentStatus: o.payment_status,
-            paymentId: o.payment_id,
-            orderStatus: o.order_status,
-            courier: o.courier,
-            trackingNumber: o.tracking_number,
-            trackingLink: o.tracking_link,
-            notes: o.notes
-          }));
-          localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(mapped));
-          return mapped;
+          if (!error && Array.isArray(data)) {
+            const mapped = data
+              .filter(o => o.id !== "SSKW-78219" && o.id !== "SSKW-84920")
+              .map(o => this.formatSupabaseOrder(o));
+            localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(mapped));
+            return mapped;
+          }
+        } catch (e) {
+          console.warn("Could not query orders from Supabase:", e);
         }
       }
     }
@@ -1108,10 +1044,56 @@ class StoreDB {
   /* ------------------- CUSTOMERS API ------------------- */
   getCustomers() {
     try {
-      return JSON.parse(localStorage.getItem(DB_KEYS.CUSTOMERS) || "[]");
+      const custs = JSON.parse(localStorage.getItem(DB_KEYS.CUSTOMERS) || "[]");
+      if (Array.isArray(custs)) {
+        const demoPhones = new Set(["9829154321", "9414012345"]);
+        const demoEmails = new Set(["pooja.sharma@example.com", "amitabh.v@example.com"]);
+        return custs.filter(
+          c => !demoPhones.has(c.phone) && !demoEmails.has(c.email?.toLowerCase()) && c.id !== "cust_1" && c.id !== "cust_2" && c.id !== "cust_01" && c.id !== "cust_02"
+        );
+      }
+      return [];
     } catch {
       return [];
     }
+  }
+
+  async getCustomersAsync() {
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error } = await client
+            .from("customers")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+          if (!error && Array.isArray(data)) {
+            const demoPhones = new Set(["9829154321", "9414012345"]);
+            const demoCustIds = new Set(["cust_01", "cust_02", "cust_1", "cust_2"]);
+            const mapped = data
+              .filter(c => !demoCustIds.has(c.id) && !demoPhones.has(c.phone))
+              .map(c => ({
+                id: c.id,
+                name: c.name,
+                email: c.email || "",
+                phone: c.phone,
+                address: c.address || "",
+                city: c.city || "Kota",
+                pincode: c.pincode || "",
+                ordersCount: c.orders_count || 1,
+                totalSpent: Number(c.total_spent || 0),
+                joinedAt: c.created_at
+              }));
+            localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify(mapped));
+            return mapped;
+          }
+        } catch (e) {
+          console.warn("Could not query customers from Supabase:", e);
+        }
+      }
+    }
+    return this.getCustomers();
   }
 
   recordCustomerPurchase(customerData, purchaseAmount) {

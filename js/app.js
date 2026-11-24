@@ -1160,13 +1160,6 @@ function openTrackingModal(prefilledOrderId = "") {
     if (e.key === "Enter") performTrack();
   });
 
-  mount.querySelectorAll(".sample-track-id").forEach((el) => {
-    el.addEventListener("click", () => {
-      if (searchInput) searchInput.value = el.textContent;
-      performTrack(el.textContent);
-    });
-  });
-
   if (prefilledOrderId) {
     performTrack(prefilledOrderId);
   }
