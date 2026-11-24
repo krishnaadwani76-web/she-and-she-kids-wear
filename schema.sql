@@ -600,3 +600,55 @@ VALUES
     ('SSKW-78219', 'prod_001', 'Rose Blush Princess Tulle Party Frock', 1599.00, 1, '4-5Y', 'Blush Pink', 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=400&q=80'),
     ('SSKW-84920', 'prod_002', 'Pastel Mint Kurta Pajama with Floral Nehru Jacket', 1899.00, 1, '5-6Y', 'Mint Green', 'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=400&q=80')
 ON CONFLICT DO NOTHING;
+
+-- ============================================================================
+-- 13. CUSTOMER INQUIRIES & CONTACT MESSAGES
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.inquiries (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL,
+    email TEXT,
+    message TEXT NOT NULL,
+    status TEXT DEFAULT 'New', -- New, Contacted, Resolved
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_inquiries_phone ON public.inquiries (phone);
+CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON public.inquiries (created_at DESC);
+
+ALTER TABLE public.inquiries ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can insert inquiries" ON public.inquiries;
+CREATE POLICY "Anyone can insert inquiries" ON public.inquiries
+    FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Anyone can read inquiries" ON public.inquiries;
+CREATE POLICY "Anyone can read inquiries" ON public.inquiries
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Admin can update inquiries" ON public.inquiries;
+CREATE POLICY "Admin can update inquiries" ON public.inquiries
+    FOR UPDATE USING (true);
+
+-- ============================================================================
+-- 14. NEWSLETTER SUBSCRIBERS
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.newsletter_subscribers (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email TEXT NOT NULL UNIQUE,
+    subscribed_at TIMESTAMPTZ DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_newsletter_email ON public.newsletter_subscribers (email);
+
+ALTER TABLE public.newsletter_subscribers ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can subscribe to newsletter" ON public.newsletter_subscribers;
+CREATE POLICY "Anyone can subscribe to newsletter" ON public.newsletter_subscribers
+    FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin can view newsletter subscribers" ON public.newsletter_subscribers;
+CREATE POLICY "Admin can view newsletter subscribers" ON public.newsletter_subscribers
+    FOR SELECT USING (true);
+

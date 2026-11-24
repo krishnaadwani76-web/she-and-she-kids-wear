@@ -332,6 +332,8 @@ function renderDashboardTab(container) {
   const products = db.getProducts();
   const orders = db.getOrders();
   const categories = db.getCategories();
+  const inquiries = db.getInquiries();
+  const subscribers = db.getNewsletterSubscribers();
   const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0);
   const pendingOrders = orders.filter(o => o.orderStatus === "Pending" || o.orderStatus === "Processing");
   const lowStockProducts = products.filter(p => Number(p.stock) < 5);
@@ -340,7 +342,7 @@ function renderDashboardTab(container) {
     <div class="space-y-6">
       
       <!-- Metrics Overview Cards -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         
         <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md">
           <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Sales</div>
@@ -366,10 +368,16 @@ function renderDashboardTab(container) {
           <div class="text-[11px] text-slate-400 mt-1">in ${categories.length} categories</div>
         </div>
 
-        <div class="p-5 rounded-2xl bg-slate-950 border ${lowStockProducts.length > 0 ? 'border-amber-500/50 bg-amber-950/20' : 'border-slate-800'} shadow-md col-span-2 sm:col-span-1">
-          <div class="text-[11px] font-bold uppercase tracking-wider text-amber-400">Low Stock Alert</div>
-          <div class="text-2xl font-black text-amber-400 font-serif mt-1.5">${lowStockProducts.length} items</div>
-          <div class="text-[11px] text-slate-400 mt-1">Less than 5 in stock</div>
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-rose-400">Inquiries</div>
+          <div class="text-2xl font-black text-rose-300 font-serif mt-1.5">${inquiries.length}</div>
+          <div class="text-[11px] text-slate-400 mt-1">Customer messages</div>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 shadow-md">
+          <div class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Newsletter</div>
+          <div class="text-2xl font-black text-indigo-300 font-serif mt-1.5">${subscribers.length}</div>
+          <div class="text-[11px] text-slate-400 mt-1">Subscribed members</div>
         </div>
 
       </div>
@@ -447,6 +455,52 @@ function renderDashboardTab(container) {
               ${orders.length === 0 ? `
                 <tr>
                   <td colspan="7" class="px-6 py-8 text-center text-slate-500">No orders received yet.</td>
+                </tr>
+              ` : ""}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Customer Inquiries Section -->
+      <div class="rounded-2xl bg-slate-950 border border-slate-800 overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
+          <div>
+            <h3 class="font-serif font-bold text-white text-sm">Customer Inquiries & Messages</h3>
+            <p class="text-[11px] text-slate-400">Direct inquiries from website Contact form</p>
+          </div>
+          <span class="text-xs bg-rose-950 text-rose-300 px-2.5 py-1 rounded-full font-bold">${inquiries.length} Inquiries</span>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+              <tr>
+                <th class="px-6 py-3">Customer</th>
+                <th class="px-6 py-3">Phone</th>
+                <th class="px-6 py-3">Email</th>
+                <th class="px-6 py-3">Message</th>
+                <th class="px-6 py-3">Date</th>
+                <th class="px-6 py-3 text-right">Quick Contact</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              ${inquiries.slice(0, 5).map(inq => `
+                <tr class="hover:bg-slate-900/60 transition">
+                  <td class="px-6 py-3.5 font-bold text-white">${inq.name}</td>
+                  <td class="px-6 py-3.5 font-mono text-rose-300">${inq.phone}</td>
+                  <td class="px-6 py-3.5 text-slate-400">${inq.email || '-'}</td>
+                  <td class="px-6 py-3.5 max-w-xs truncate text-slate-200" title="${inq.message}">${inq.message}</td>
+                  <td class="px-6 py-3.5 text-slate-400">${new Date(inq.createdAt).toLocaleDateString("en-IN")}</td>
+                  <td class="px-6 py-3.5 text-right space-x-2">
+                    <a href="https://wa.me/91${inq.phone.replace(/\\D/g, '').slice(-10)}" target="_blank" class="text-emerald-400 hover:text-emerald-300 font-bold">WhatsApp</a>
+                    <a href="tel:${inq.phone}" class="text-rose-400 hover:text-rose-300 font-bold">Call</a>
+                  </td>
+                </tr>
+              `).join("")}
+              ${inquiries.length === 0 ? `
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center text-slate-500">No customer inquiries received yet. Inquiries submitted on the website appear here instantly.</td>
                 </tr>
               ` : ""}
             </tbody>

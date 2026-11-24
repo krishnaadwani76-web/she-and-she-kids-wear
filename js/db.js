@@ -20,7 +20,9 @@ export const DB_KEYS = {
   WISHLIST: "sskw_wishlist_v1",
   SETTINGS: "sskw_settings_v1",
   ADMIN_SESSION: "sskw_admin_session_v1",
-  ADMIN_CREDS: "sskw_admin_creds_v1"
+  ADMIN_CREDS: "sskw_admin_creds_v1",
+  INQUIRIES: "sskw_inquiries_v1",
+  NEWSLETTER: "sskw_newsletter_v1"
 };
 
 class StoreDB {
@@ -233,6 +235,14 @@ class StoreDB {
           password: "admin123"
         })
       );
+    }
+
+    // 8. Customer Inquiries & Newsletter Subscribers
+    if (!localStorage.getItem(DB_KEYS.INQUIRIES)) {
+      localStorage.setItem(DB_KEYS.INQUIRIES, JSON.stringify([]));
+    }
+    if (!localStorage.getItem(DB_KEYS.NEWSLETTER)) {
+      localStorage.setItem(DB_KEYS.NEWSLETTER, JSON.stringify([]));
     }
   }
 
@@ -504,33 +514,7 @@ class StoreDB {
         }
         const { data, error } = await query;
         if (!error && data) {
-          const mapped = data.map(p => ({
-            id: p.id,
-            name: p.name,
-            slug: p.slug,
-            category: p.category,
-            subCategory: p.sub_category,
-            price: Number(p.price),
-            discountPrice: p.discount_price ? Number(p.discount_price) : null,
-            stock: p.stock,
-            badge: p.badge,
-            isNew: p.is_new,
-            isBestSeller: p.is_bestseller,
-            isFeatured: p.is_featured,
-            isActive: p.is_active,
-            images: Array.isArray(p.images) ? p.images : [],
-            colors: Array.isArray(p.colors) ? p.colors : [],
-            sizes: Array.isArray(p.sizes) ? p.sizes : [],
-            fabric: p.fabric,
-            ageGroup: p.age_group,
-            comfortAndStyling: p.comfort_and_styling,
-            washingInstructions: p.washing_instructions,
-            description: p.description,
-            rating: Number(p.rating || 5.0),
-            reviewCount: p.review_count || 1,
-            createdAt: p.created_at,
-            updatedAt: p.updated_at
-          }));
+          const mapped = data.map(p => this.formatSupabaseProduct(p));
           if (!onlyActive) {
             localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(mapped));
           }
@@ -541,14 +525,82 @@ class StoreDB {
     return this.getProducts(onlyActive);
   }
 
+  formatSupabaseProduct(p) {
+    return {
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      category: p.category,
+      subCategory: p.sub_category || "casual",
+      price: Number(p.price),
+      discountPrice: p.discount_price ? Number(p.discount_price) : null,
+      stock: Number(p.stock ?? 10),
+      badge: p.badge || null,
+      isNew: Boolean(p.is_new),
+      isBestSeller: Boolean(p.is_bestseller),
+      isFeatured: Boolean(p.is_featured),
+      isActive: p.is_active !== false,
+      images: Array.isArray(p.images) ? p.images : [],
+      colors: Array.isArray(p.colors) ? p.colors : [],
+      sizes: Array.isArray(p.sizes) ? p.sizes : [],
+      fabric: p.fabric || "",
+      ageGroup: p.age_group || "1 to 16 Years",
+      comfortAndStyling: p.comfort_and_styling || "",
+      washingInstructions: p.washing_instructions || "",
+      description: p.description || "",
+      rating: Number(p.rating || 5.0),
+      reviewCount: Number(p.review_count || 1),
+      createdAt: p.created_at || new Date().toISOString(),
+      updatedAt: p.updated_at || new Date().toISOString()
+    };
+  }
+
   getProductById(id) {
     const products = this.getProducts();
     return products.find(p => p.id === id) || null;
   }
 
+  async getProductByIdAsync(id) {
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error } = await client.from("products").select("*").eq("id", id).maybeSingle();
+          if (!error && data) {
+            return this.formatSupabaseProduct(data);
+          }
+        } catch (e) {
+          console.warn("Could not query product by ID from Supabase:", e);
+        }
+      }
+    }
+    return this.getProductById(id);
+  }
+
   getProductBySlug(slug) {
     const products = this.getProducts();
     return products.find(p => p.slug === slug) || null;
+  }
+
+  async getProductBySlugAsync(slug) {
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          let { data } = await client.from("products").select("*").eq("slug", slug).maybeSingle();
+          if (!data) {
+            const byId = await client.from("products").select("*").eq("id", slug).maybeSingle();
+            data = byId.data;
+          }
+          if (data) {
+            return this.formatSupabaseProduct(data);
+          }
+        } catch (e) {
+          console.warn("Could not query product by slug from Supabase:", e);
+        }
+      }
+    }
+    return this.getProductBySlug(slug) || this.getProductById(slug);
   }
 
   async saveProductAsync(productData) {
@@ -847,158 +899,168 @@ class StoreDB {
   }
 
   getOrderById(orderId) {
+    if (!orderId) return null;
+    const clean = orderId.trim();
+    const cleanUpper = clean.toUpperCase();
+    const digits = clean.replace(/\D/g, "");
     const orders = this.getOrders();
-    return orders.find(o => o.id.toUpperCase() === orderId.toUpperCase().trim()) || null;
+    return orders.find(o => 
+      o.id.toUpperCase() === cleanUpper ||
+      (o.trackingNumber && o.trackingNumber.toUpperCase() === cleanUpper) ||
+      (digits.length >= 10 && o.customer?.phone && o.customer.phone.replace(/\D/g, "").includes(digits.slice(-10)))
+    ) || null;
   }
 
-  async getOrderByIdAsync(orderId) {
-    const cleanId = orderId.toUpperCase().trim();
-    if (isSupabaseConfigured()) {
-      const client = await getSupabaseClient();
-      if (client) {
-        const { data, error } = await client
-          .from("orders")
-          .select("*, order_items(*)")
-          .eq("id", cleanId)
-          .single();
-
-        if (!error && data) {
-          return {
-            id: data.id,
-            createdAt: data.created_at,
-            customer: {
-              name: data.customer_name,
-              email: data.customer_email,
-              phone: data.customer_phone,
-              address: data.customer_address,
-              city: data.customer_city,
-              state: data.customer_state,
-              pincode: data.customer_pincode
-            },
-            items: (data.order_items || []).map(item => ({
-              id: item.product_id,
-              name: item.name,
-              price: Number(item.price),
-              quantity: item.quantity,
-              size: item.size,
-              color: item.color,
-              image: item.image
-            })),
-            subtotal: Number(data.subtotal),
-            discount: Number(data.discount || 0),
-            shipping: Number(data.shipping || 0),
-            total: Number(data.total),
-            paymentMethod: data.payment_method,
-            paymentStatus: data.payment_status,
-            paymentId: data.payment_id,
-            orderStatus: data.order_status,
-            courier: data.courier,
-            trackingNumber: data.tracking_number,
-            trackingLink: data.tracking_link
-          };
-        }
-      }
-    }
-    return this.getOrderById(cleanId);
-  }
-
-  async createOrderAsync({ customer, items, subtotal, discount, shipping, total, paymentMethod, paymentId, paymentStatus = "Paid" }) {
-    const orders = this.getOrders();
-    const randomDigits = Math.floor(10000 + Math.random() * 90000);
-    const newOrderId = `SSKW-${randomDigits}`;
-
-    const newOrder = {
-      id: newOrderId,
-      createdAt: new Date().toISOString(),
-      customer,
-      items,
-      subtotal,
-      discount,
-      shipping,
-      total,
-      paymentMethod,
-      paymentId: paymentId || `pay_${Date.now()}`,
-      paymentStatus: paymentMethod.includes("COD") ? "Pending on Delivery" : paymentStatus,
-      orderStatus: "Processing",
-      courier: "Delhivery Express Kota",
-      trackingNumber: `DL-${Math.floor(10000000 + Math.random() * 90000000)}`,
-      trackingLink: `https://www.delhivery.com/track/package/DL-${Math.floor(10000000 + Math.random() * 90000000)}`
+  formatSupabaseOrder(data) {
+    return {
+      id: data.id,
+      createdAt: data.created_at,
+      customer: {
+        name: data.customer_name,
+        email: data.customer_email || "",
+        phone: data.customer_phone,
+        address: data.customer_address,
+        city: data.customer_city || "Kota",
+        state: data.customer_state || "Rajasthan",
+        pincode: data.customer_pincode
+      },
+      items: (data.order_items || []).map(item => ({
+        id: item.product_id,
+        name: item.name,
+        price: Number(item.price),
+        quantity: item.quantity,
+        size: item.size || "",
+        color: item.color || "",
+        image: item.image || ""
+      })),
+      subtotal: Number(data.subtotal),
+      discount: Number(data.discount || 0),
+      shipping: Number(data.shipping || 0),
+      total: Number(data.total),
+      paymentMethod: data.payment_method,
+      paymentStatus: data.payment_status,
+      paymentId: data.payment_id,
+      orderStatus: data.order_status,
+      courier: data.courier,
+      trackingNumber: data.tracking_number,
+      trackingLink: data.tracking_link
     };
+  }
 
-    orders.unshift(newOrder);
-    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify(orders));
+  async getOrderByIdAsync(query) {
+    if (!query) return null;
+    const clean = query.trim();
+    const cleanUpper = clean.toUpperCase();
 
-    // Decrement stock in local DB
-    const products = this.getProducts();
-    items.forEach(item => {
-      const prod = products.find(p => p.id === item.id);
-      if (prod && typeof prod.stock === "number") {
-        prod.stock = Math.max(0, prod.stock - item.quantity);
-      }
-    });
-    localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(products));
-
-    // Record customer
-    this.recordCustomerPurchase(customer, total);
-
-    // Clear cart
-    this.clearCart();
-    this.notifyChange("orders");
-    this.notifyChange("products");
-
-    // Push to Supabase if configured
     if (isSupabaseConfigured()) {
       const client = await getSupabaseClient();
       if (client) {
         try {
-          await client.from("orders").insert({
-            id: newOrder.id,
-            customer_name: customer.name,
-            customer_email: customer.email || "",
-            customer_phone: customer.phone,
-            customer_address: customer.address,
-            customer_city: customer.city || "Kota",
-            customer_state: customer.state || "Rajasthan",
-            customer_pincode: customer.pincode,
-            subtotal: subtotal,
-            discount: discount || 0,
-            shipping: shipping || 0,
-            total: total,
-            payment_method: paymentMethod,
-            payment_status: newOrder.paymentStatus,
-            payment_id: newOrder.paymentId,
-            order_status: newOrder.orderStatus,
-            courier: newOrder.courier,
-            tracking_number: newOrder.trackingNumber,
-            tracking_link: newOrder.trackingLink
-          });
+          // 1. Try by Order ID
+          let { data } = await client
+            .from("orders")
+            .select("*, order_items(*)")
+            .eq("id", cleanUpper)
+            .maybeSingle();
 
-          // Insert order items
-          const itemsPayload = items.map(item => ({
-            order_id: newOrder.id,
-            product_id: item.id,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            size: item.size || "",
-            color: item.color || "",
-            image: item.image || ""
-          }));
-          await client.from("order_items").insert(itemsPayload);
-
-          // Update stock in Supabase
-          for (const item of items) {
-            const prod = products.find(p => p.id === item.id);
-            if (prod) {
-              await client.from("products").update({ stock: prod.stock }).eq("id", item.id);
+          // 2. Try by Tracking Number if not found
+          if (!data) {
+            const trackRes = await client
+              .from("orders")
+              .select("*, order_items(*)")
+              .ilike("tracking_number", `%${cleanUpper}%`)
+              .limit(1);
+            if (trackRes.data && trackRes.data.length > 0) {
+              data = trackRes.data[0];
             }
           }
+
+          // 3. Try by Phone Number if at least 10 digits
+          if (!data && clean.replace(/\D/g, "").length >= 10) {
+            const rawPhone = clean.replace(/\D/g, "").slice(-10);
+            const phoneRes = await client
+              .from("orders")
+              .select("*, order_items(*)")
+              .ilike("customer_phone", `%${rawPhone}%`)
+              .order("created_at", { ascending: false })
+              .limit(1);
+            if (phoneRes.data && phoneRes.data.length > 0) {
+              data = phoneRes.data[0];
+            }
+          }
+
+          if (data) {
+            return this.formatSupabaseOrder(data);
+          }
         } catch (e) {
-          console.warn("Could not push order to Supabase:", e);
+          console.warn("Could not query order from Supabase:", e);
         }
       }
     }
+    return this.getOrderById(clean);
+  }
 
+  async pushOrderToSupabase(newOrder) {
+    if (!isSupabaseConfigured()) return;
+    const client = await getSupabaseClient();
+    if (!client) return;
+
+    try {
+      await client.from("orders").insert({
+        id: newOrder.id,
+        customer_name: newOrder.customer.name,
+        customer_email: newOrder.customer.email || "",
+        customer_phone: newOrder.customer.phone,
+        customer_address: newOrder.customer.address,
+        customer_city: newOrder.customer.city || "Kota",
+        customer_state: newOrder.customer.state || "Rajasthan",
+        customer_pincode: newOrder.customer.pincode,
+        subtotal: newOrder.subtotal,
+        discount: newOrder.discount || 0,
+        shipping: newOrder.shipping || 0,
+        total: newOrder.total,
+        payment_method: newOrder.paymentMethod,
+        payment_status: newOrder.paymentStatus,
+        payment_id: newOrder.paymentId,
+        order_status: newOrder.orderStatus,
+        courier: newOrder.courier,
+        tracking_number: newOrder.trackingNumber,
+        tracking_link: newOrder.trackingLink
+      });
+
+      // Insert order items
+      if (newOrder.items && newOrder.items.length > 0) {
+        const itemsPayload = newOrder.items.map(item => ({
+          order_id: newOrder.id,
+          product_id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          size: item.size || "",
+          color: item.color || "",
+          image: item.image || ""
+        }));
+        await client.from("order_items").insert(itemsPayload);
+      }
+
+      // Update stock in Supabase
+      const products = this.getProducts();
+      for (const item of (newOrder.items || [])) {
+        const prod = products.find(p => p.id === item.id);
+        if (prod) {
+          await client.from("products").update({ stock: prod.stock }).eq("id", item.id);
+        }
+      }
+    } catch (e) {
+      console.warn("Could not push order to Supabase:", e);
+    }
+  }
+
+  async createOrderAsync(orderData) {
+    const newOrder = this.createOrder(orderData);
+    if (isSupabaseConfigured()) {
+      await this.pushOrderToSupabase(newOrder);
+    }
     return newOrder;
   }
 
@@ -1081,6 +1143,30 @@ class StoreDB {
 
     localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify(customers));
     this.notifyChange("customers");
+
+    if (isSupabaseConfigured()) {
+      getSupabaseClient().then(client => {
+        if (!client) return;
+        const target = existing || customers[0];
+        client
+          .from("customers")
+          .upsert({
+            id: target.id,
+            name: target.name,
+            email: target.email || "",
+            phone: target.phone,
+            address: target.address || customerData.address || "",
+            city: target.city || customerData.city || "Kota",
+            state: "Rajasthan",
+            pincode: target.pincode || customerData.pincode || "",
+            orders_count: target.ordersCount || 1,
+            total_spent: target.totalSpent || 0,
+            last_order_at: target.lastOrderAt || new Date().toISOString()
+          }, { onConflict: "phone" })
+          .then(() => {})
+          .catch(e => console.warn("Supabase customer sync error:", e));
+      });
+    }
   }
 
   /* ------------------- SETTINGS & CONTENT API ------------------- */
@@ -1297,7 +1383,7 @@ class StoreDB {
 
     // Async push to Supabase in background
     if (isSupabaseConfigured()) {
-      this.createOrderAsync(orderData).catch((e) => console.warn("Supabase order push error:", e));
+      this.pushOrderToSupabase(newOrder).catch((e) => console.warn("Supabase order push error:", e));
     }
 
     return newOrder;
@@ -1368,17 +1454,200 @@ class StoreDB {
         });
       }
 
-      // 3. Sync settings
+      // 3. Sync customers
+      const customers = this.getCustomers();
+      for (const cust of customers) {
+        await client.from("customers").upsert({
+          id: cust.id,
+          name: cust.name,
+          email: cust.email || "",
+          phone: cust.phone,
+          address: cust.address || "",
+          city: cust.city || "Kota",
+          state: cust.state || "Rajasthan",
+          pincode: cust.pincode || "",
+          orders_count: cust.ordersCount || 1,
+          total_spent: cust.totalSpent || 0,
+          last_order_at: cust.lastOrderAt || new Date().toISOString()
+        }, { onConflict: "phone" });
+      }
+
+      // 4. Sync orders & items
+      const orders = this.getOrders();
+      for (const ord of orders) {
+        await client.from("orders").upsert({
+          id: ord.id,
+          customer_name: ord.customer?.name || "Customer",
+          customer_email: ord.customer?.email || "",
+          customer_phone: ord.customer?.phone || "",
+          customer_address: ord.customer?.address || "",
+          customer_city: ord.customer?.city || "Kota",
+          customer_state: ord.customer?.state || "Rajasthan",
+          customer_pincode: ord.customer?.pincode || "",
+          subtotal: ord.subtotal || ord.total,
+          discount: ord.discount || 0,
+          shipping: ord.shipping || 0,
+          total: ord.total,
+          payment_method: ord.paymentMethod || "Cash on Delivery",
+          payment_status: ord.paymentStatus || "Paid",
+          payment_id: ord.paymentId || "",
+          order_status: ord.orderStatus || "Processing",
+          courier: ord.courier || "Delhivery Express Kota",
+          tracking_number: ord.trackingNumber || "",
+          tracking_link: ord.trackingLink || ""
+        });
+
+        if (Array.isArray(ord.items)) {
+          for (const it of ord.items) {
+            await client.from("order_items").upsert({
+              order_id: ord.id,
+              product_id: it.id,
+              name: it.name,
+              price: it.price,
+              quantity: it.quantity,
+              size: it.size || "",
+              color: it.color || "",
+              image: it.image || ""
+            });
+          }
+        }
+      }
+
+      // 5. Sync settings
       const settings = this.getSettings();
       await this.updateSettingsAsync(settings);
 
       return {
         success: true,
-        message: `Successfully synchronized ${products.length} products and ${categories.length} categories to Supabase Cloud!`
+        message: `Successfully synchronized ${products.length} products, ${categories.length} categories, ${orders.length} orders, and ${customers.length} customers to Supabase Cloud!`
       };
     } catch (err) {
       return { success: false, message: err.message || "Failed to push data to Supabase" };
     }
+  }
+
+  /* ------------------- INQUIRIES & CONTACT ------------------- */
+  getInquiries() {
+    try {
+      return JSON.parse(localStorage.getItem(DB_KEYS.INQUIRIES) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  async getInquiriesAsync() {
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          const { data, error } = await client
+            .from("inquiries")
+            .select("*")
+            .order("created_at", { ascending: false });
+          if (!error && Array.isArray(data)) {
+            const formatted = data.map((d) => ({
+              id: d.id,
+              name: d.name,
+              phone: d.phone,
+              email: d.email || "",
+              message: d.message,
+              status: d.status || "New",
+              createdAt: d.created_at
+            }));
+            localStorage.setItem(DB_KEYS.INQUIRIES, JSON.stringify(formatted));
+            return formatted;
+          }
+        } catch (e) {
+          console.warn("Could not fetch inquiries from Supabase:", e);
+        }
+      }
+    }
+    return this.getInquiries();
+  }
+
+  async saveInquiry({ name, phone, email = "", message }) {
+    const inquiries = this.getInquiries();
+    const newInquiry = {
+      id: `INQ-${Math.floor(10000 + Math.random() * 90000)}`,
+      name: (name || "").trim(),
+      phone: (phone || "").trim(),
+      email: (email || "").trim(),
+      message: (message || "").trim(),
+      status: "New",
+      createdAt: new Date().toISOString()
+    };
+
+    inquiries.unshift(newInquiry);
+    localStorage.setItem(DB_KEYS.INQUIRIES, JSON.stringify(inquiries));
+    this.notifyChange("inquiries");
+
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          await client.from("inquiries").insert({
+            id: newInquiry.id,
+            name: newInquiry.name,
+            phone: newInquiry.phone,
+            email: newInquiry.email,
+            message: newInquiry.message,
+            status: newInquiry.status,
+            created_at: newInquiry.createdAt
+          });
+        } catch (e) {
+          console.warn("Could not push inquiry to Supabase:", e);
+        }
+      }
+    }
+
+    return { success: true, inquiry: newInquiry };
+  }
+
+  /* ------------------- NEWSLETTER SUBSCRIBERS ------------------- */
+  getNewsletterSubscribers() {
+    try {
+      return JSON.parse(localStorage.getItem(DB_KEYS.NEWSLETTER) || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  async saveNewsletterSubscriber(email) {
+    const cleanEmail = (email || "").trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes("@")) {
+      return { success: false, message: "Please enter a valid email address." };
+    }
+
+    const subscribers = this.getNewsletterSubscribers();
+    const alreadySubscribed = subscribers.some((s) => s.email === cleanEmail);
+    if (alreadySubscribed) {
+      return { success: true, message: "You are already subscribed to our newsletter!" };
+    }
+
+    const newSub = {
+      id: `SUB-${Date.now()}`,
+      email: cleanEmail,
+      subscribedAt: new Date().toISOString()
+    };
+    subscribers.unshift(newSub);
+    localStorage.setItem(DB_KEYS.NEWSLETTER, JSON.stringify(subscribers));
+    this.notifyChange("newsletter");
+
+    if (isSupabaseConfigured()) {
+      const client = await getSupabaseClient();
+      if (client) {
+        try {
+          await client.from("newsletter_subscribers").insert({
+            email: cleanEmail,
+            subscribed_at: newSub.subscribedAt
+          });
+        } catch (e) {
+          console.warn("Could not push newsletter subscriber to Supabase:", e);
+        }
+      }
+    }
+
+    return { success: true, message: "Thank you for subscribing to She & She Kids Wear updates!" };
   }
 
   /* ------------------- REACTIVE LISTENERS ------------------- */

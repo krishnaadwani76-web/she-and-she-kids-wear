@@ -34,6 +34,18 @@ export function getSupabaseConfig() {
   } catch (e) {
     console.warn("Could not read Supabase config from storage", e);
   }
+
+  // Check window.__ENV__ if injected by hosting environment
+  if (typeof window !== "undefined" && window.__ENV__) {
+    if (window.__ENV__.SUPABASE_URL && window.__ENV__.SUPABASE_ANON_KEY) {
+      return {
+        supabaseUrl: window.__ENV__.SUPABASE_URL.trim(),
+        supabaseAnonKey: window.__ENV__.SUPABASE_ANON_KEY.trim(),
+        storageBucket: window.__ENV__.STORAGE_BUCKET || "product-images"
+      };
+    }
+  }
+
   return DEFAULT_CONFIG;
 }
 

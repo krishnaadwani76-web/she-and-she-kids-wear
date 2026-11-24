@@ -147,6 +147,7 @@ export function renderContactSection() {
                     <label class="block text-xs font-bold text-slate-700 mb-1">Your Name *</label>
                     <input
                       type="text"
+                      id="contact-name-input"
                       required
                       placeholder="e.g. Renu Meena"
                       class="w-full px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs focus:outline-none focus:ring-2 focus:ring-rose-400"
@@ -156,6 +157,7 @@ export function renderContactSection() {
                     <label class="block text-xs font-bold text-slate-700 mb-1">Contact Phone *</label>
                     <input
                       type="tel"
+                      id="contact-phone-input"
                       required
                       placeholder="+91 88248XXXXX"
                       class="w-full px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs focus:outline-none focus:ring-2 focus:ring-rose-400"
@@ -167,6 +169,7 @@ export function renderContactSection() {
                   <label class="block text-xs font-bold text-slate-700 mb-1">Email Address</label>
                   <input
                     type="email"
+                    id="contact-email-input"
                     placeholder="renu@example.com"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs focus:outline-none focus:ring-2 focus:ring-rose-400"
                   />
@@ -175,6 +178,7 @@ export function renderContactSection() {
                 <div>
                   <label class="block text-xs font-bold text-slate-700 mb-1">Your Message / Inquiry *</label>
                   <textarea
+                    id="contact-message-input"
                     rows="3"
                     required
                     placeholder="Ask us about sizing, availability for 3-4Y frocks, or festive delivery dates..."

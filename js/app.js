@@ -572,10 +572,16 @@ function setupEventListeners() {
   // 16. Newsletter Form Submit
   const newsletterForm = document.getElementById("newsletter-form");
   if (newsletterForm) {
-    newsletterForm.addEventListener("submit", (e) => {
+    newsletterForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const email = document.getElementById("newsletter-email")?.value;
-      showToast(`Welcome to She & She Club! A ₹250 welcome code was sent to ${email}`, "success", 5000);
+      const emailInput = document.getElementById("newsletter-email");
+      const email = emailInput?.value?.trim();
+      if (!email) {
+        showToast("Please enter a valid email address.", "warning");
+        return;
+      }
+      const res = await db.saveNewsletterSubscriber(email);
+      showToast(res.message || "Thank you for subscribing to She & She Kids Wear!", "success", 4000);
       newsletterForm.reset();
     });
   }
@@ -583,9 +589,20 @@ function setupEventListeners() {
   // 17. Contact Inquiry Form Submit
   const inquiryForm = document.getElementById("contact-inquiry-form");
   if (inquiryForm) {
-    inquiryForm.addEventListener("submit", (e) => {
+    inquiryForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      showToast("Thank you! Store Manager will contact you within 2 hours.", "success", 4000);
+      const name = document.getElementById("contact-name-input")?.value?.trim() || "";
+      const phone = document.getElementById("contact-phone-input")?.value?.trim() || "";
+      const email = document.getElementById("contact-email-input")?.value?.trim() || "";
+      const message = document.getElementById("contact-message-input")?.value?.trim() || "";
+
+      if (!name || !phone || !message) {
+        showToast("Please fill in your name, contact phone, and message.", "warning");
+        return;
+      }
+
+      await db.saveInquiry({ name, phone, email, message });
+      showToast(`Thank you, ${name}! Store Manager will contact you at ${phone} shortly.`, "success", 5000);
       inquiryForm.reset();
     });
   }
@@ -754,8 +771,11 @@ function updateBadges() {
 
 /* ------------------- MODAL CONTROLLERS ------------------- */
 
-function openProductModal(productIdOrSlug) {
-  const product = db.getProductById(productIdOrSlug) || db.getProductBySlug(productIdOrSlug);
+async function openProductModal(productIdOrSlug) {
+  let product = db.getProductById(productIdOrSlug) || db.getProductBySlug(productIdOrSlug);
+  if (!product) {
+    product = await db.getProductBySlugAsync(productIdOrSlug);
+  }
   if (!product) return;
 
   const productSlug = product.slug || product.id;
@@ -1111,15 +1131,24 @@ function openTrackingModal(prefilledOrderId = "") {
     if (e.target.id === "order-tracking-modal") closeTracking();
   });
 
-  const performTrack = (query) => {
+  const performTrack = async (query) => {
     const q = (query || searchInput?.value || "").trim();
     if (!q) return;
 
-    // Search by ID or Phone
-    const orders = db.getOrders();
-    const found = orders.find(
-      (o) => o.id.toUpperCase() === q.toUpperCase() || (o.customer?.phone && o.customer.phone === q)
-    );
+    if (resultArea) {
+      resultArea.innerHTML = `
+        <div class="p-8 text-center space-y-3">
+          <div class="inline-block animate-spin w-8 h-8 border-4 border-rose-500 border-t-transparent rounded-full"></div>
+          <p class="text-sm text-slate-500 font-medium">Fetching live order tracking details...</p>
+        </div>
+      `;
+    }
+
+    // Check local storage or query Supabase Cloud
+    let found = db.getOrderById(q);
+    if (!found) {
+      found = await db.getOrderByIdAsync(q);
+    }
 
     if (resultArea) {
       resultArea.innerHTML = buildTrackingTimelineHTML(found);

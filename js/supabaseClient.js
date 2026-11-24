@@ -17,14 +17,27 @@ async function loadSupabaseSdk() {
     supabaseSdk = window.supabase;
     return supabaseSdk;
   }
-  try {
-    const module = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
-    supabaseSdk = module;
-    return supabaseSdk;
-  } catch (err) {
-    console.error("Failed to load Supabase JS SDK:", err);
-    return null;
+
+  const cdnMirrors = [
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm",
+    "https://esm.sh/@supabase/supabase-js@2",
+    "https://unpkg.com/@supabase/supabase-js@2?module"
+  ];
+
+  for (const cdnUrl of cdnMirrors) {
+    try {
+      const module = await import(cdnUrl);
+      if (module && (module.createClient || module.default?.createClient)) {
+        supabaseSdk = module.createClient ? module : module.default;
+        return supabaseSdk;
+      }
+    } catch (err) {
+      console.warn(`Could not load Supabase SDK from ${cdnUrl}, trying fallback...`, err);
+    }
   }
+
+  console.error("Failed to load Supabase JS SDK from all CDN mirrors.");
+  return null;
 }
 
 /**
