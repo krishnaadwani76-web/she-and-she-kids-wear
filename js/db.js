@@ -93,7 +93,7 @@ class StoreDB {
     if (!localStorage.getItem(DB_KEYS.SETTINGS)) {
       const settings = {
         storeInfo: STORE_INFO,
-        announcement: "Free Express Shipping on Orders Above ₹999 | Use Code: FIRSTKID for 15% OFF",
+        announcement: "",
         freeShippingThreshold: 999,
         shippingFee: 99,
         razorpayKeyId: "rzp_test_sheandshe_kids",
@@ -195,7 +195,24 @@ class StoreDB {
         }
       }
 
-      // 3. If Supabase Cloud is configured, also purge legacy demo orders from cloud database
+      // 3. Cleanse localStorage settings announcement (remove legacy announcement)
+      const settingsRaw = localStorage.getItem(DB_KEYS.SETTINGS);
+      if (settingsRaw) {
+        try {
+          const settings = JSON.parse(settingsRaw);
+          if (
+            settings &&
+            (settings.announcement?.includes("FIRSTKID") ||
+             settings.announcement?.includes("Free Express Shipping") ||
+             settings.announcement?.includes("Free Shipping on Orders Above"))
+          ) {
+            settings.announcement = "";
+            localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(settings));
+          }
+        } catch {}
+      }
+
+      // 4. If Supabase Cloud is configured, also purge legacy demo orders from cloud database
       if (isSupabaseConfigured()) {
         getSupabaseClient().then((client) => {
           if (!client) return;

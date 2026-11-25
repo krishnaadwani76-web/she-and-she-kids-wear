@@ -1112,7 +1112,8 @@ function renderContentTab(container) {
               <input
                 type="text"
                 id="content-announcement"
-                value="${settings.announcement || 'Free Express Shipping on Orders Above ₹999 | Use Code: FIRSTKID for 15% OFF'}"
+                value="${(settings.announcement && !settings.announcement.includes('FIRSTKID') && !settings.announcement.includes('Free Express Shipping')) ? settings.announcement : ''}"
+                placeholder="Optional announcement text (leave blank to hide)"
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>

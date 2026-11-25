@@ -162,7 +162,7 @@ export function renderCartDrawer() {
                   <input
                     id="cart-coupon-input"
                     type="text"
-                    placeholder="Enter Coupon (e.g. FIRSTKID)"
+                    placeholder="Enter Promo Code"
                     value="${currentCoupon}"
                     class="flex-1 px-3 py-2 rounded-xl border border-rose-200 text-xs bg-white uppercase font-bold focus:outline-none focus:ring-2 focus:ring-rose-300"
                   />

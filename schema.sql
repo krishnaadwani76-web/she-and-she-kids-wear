@@ -506,7 +506,7 @@ VALUES
         "address": "Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan, India - 324009",
         "timings": "Monday – Saturday: 10:30 AM – 9:00 PM | Sunday: 11:00 AM – 8:00 PM",
         "mapsUrl": "https://www.google.com/maps/search/?api=1&query=Dadabari,+Kota,+Rajasthan,+India",
-        "announcement": "Free Express Shipping on Orders Above ₹999 | Use Code: FIRSTKID for 15% OFF",
+        "announcement": "",
         "freeShippingThreshold": 999,
         "shippingFee": 99,
         "enableCod": true,

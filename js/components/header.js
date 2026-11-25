@@ -13,9 +13,13 @@ export function renderHeader() {
   const wishlist = db.getWishlist();
   const isAdmin = db.isAdminAuthenticated();
 
+  const rawAnnouncement = (settings.announcement || "").trim();
   const announcementText =
-    settings.announcement ||
-    "Free Shipping on Orders Above ₹999 | Use Code: FIRSTKID for 15% OFF";
+    (rawAnnouncement.includes("FIRSTKID") ||
+     rawAnnouncement.includes("Free Express Shipping") ||
+     rawAnnouncement.includes("Free Shipping on Orders Above"))
+      ? ""
+      : rawAnnouncement;
 
   return `
     <!-- Top Announcement Bar -->
@@ -34,7 +38,7 @@ export function renderHeader() {
         </div>
 
         <div class="flex-1 text-center font-semibold tracking-wide text-[11px] sm:text-xs">
-          <span>✨ ${announcementText} ✨</span>
+          ${announcementText ? `<span>✨ ${announcementText} ✨</span>` : ""}
         </div>
 
         <div class="hidden sm:flex items-center gap-4 text-rose-100 text-[11px]">

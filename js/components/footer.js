@@ -16,13 +16,13 @@ export function renderFooter() {
         <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
           <div class="space-y-2">
             <span class="inline-block px-3 py-1 rounded-full bg-yellow-400 text-slate-900 font-black text-[11px] uppercase tracking-wider">
-              Limited Festive Offer
+              Boutique Collection
             </span>
             <h3 class="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Get Flat 15% OFF On Your First Order!
+              Premium Handcrafted Kidswear
             </h3>
             <p class="text-rose-100 text-xs sm:text-sm">
-              Use promo coupon <strong class="bg-white/20 px-2 py-0.5 rounded-md font-mono text-white">FIRSTKID</strong> during checkout.
+              Discover beautiful party frocks, festive kurtas, and organic baby wear crafted with love in Dadabari, Kota.
             </p>
           </div>
 
@@ -31,7 +31,7 @@ export function renderFooter() {
               href="#category/all"
               class="px-8 py-3.5 rounded-full bg-white text-rose-700 hover:bg-rose-50 font-bold text-xs shadow-xl transition transform hover:scale-105 active:scale-95"
             >
-              Claim 15% Discount →
+              Shop Collection →
             </a>
           </div>
         </div>
