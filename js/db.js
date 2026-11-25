@@ -7,9 +7,9 @@
  * Full CRUD operations for Products, Categories, Orders, Customers, and Website Settings.
  */
 
-import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=2.6";
-import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=2.6";
-import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=2.6";
+import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=2.7";
+import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=2.7";
+import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=2.7";
 
 export const DB_KEYS = {
   PRODUCTS: "sskw_products_v1",
@@ -139,6 +139,15 @@ class StoreDB {
             storedSettings.storeInfo.cid = STORE_INFO.cid;
             storedSettings.storeInfo.placeId = STORE_INFO.placeId;
             storedSettings.storeInfo.coords = STORE_INFO.coords;
+            needsUpdate = true;
+          }
+
+          if (
+            !storedSettings.storeInfo.instagram ||
+            !storedSettings.storeInfo.instagram.includes("she_n_she_kids_wear")
+          ) {
+            storedSettings.storeInfo.instagram = STORE_INFO.instagram;
+            storedSettings.storeInfo.instagramHandle = STORE_INFO.instagramHandle;
             needsUpdate = true;
           }
 
@@ -367,7 +376,9 @@ class StoreDB {
                 email: row.value.email || current.storeInfo.email,
                 address: row.value.address || current.storeInfo.address,
                 timings: row.value.timings || current.storeInfo.timings,
-                mapsUrl: row.value.mapsUrl || current.storeInfo.mapsUrl
+                mapsUrl: row.value.mapsUrl || current.storeInfo.mapsUrl,
+                instagram: row.value.instagram || current.storeInfo.instagram,
+                instagramHandle: row.value.instagramHandle || current.storeInfo.instagramHandle
               };
             }
           }
@@ -1239,6 +1250,8 @@ class StoreDB {
             address: updated.storeInfo?.address || "",
             timings: updated.storeInfo?.timings || "",
             mapsUrl: updated.storeInfo?.mapsUrl || "",
+            instagram: updated.storeInfo?.instagram || STORE_INFO.instagram,
+            instagramHandle: updated.storeInfo?.instagramHandle || STORE_INFO.instagramHandle,
             announcement: updated.announcement || "",
             freeShippingThreshold: updated.freeShippingThreshold || 999,
             shippingFee: updated.shippingFee || 99,

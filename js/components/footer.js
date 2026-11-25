@@ -4,7 +4,7 @@
  * and comprehensive Indian e-commerce legal policies.
  */
 
-import { STORE_INFO } from "../data/seedProducts.js";
+import { STORE_INFO } from "../data/seedProducts.js?v=2.7";
 
 export function renderFooter() {
   return `
@@ -113,41 +113,41 @@ export function renderFooter() {
             <h3 class="font-serif text-2xl font-bold text-slate-900">Follow Our Little Trendsetters</h3>
           </div>
           <a
-            href="https://instagram.com"
+            href="${STORE_INFO.instagram}"
             target="_blank"
             rel="noopener noreferrer"
-            class="px-5 py-2 rounded-full border border-rose-200 text-rose-700 hover:bg-rose-50 font-bold text-xs transition flex items-center gap-2"
+            class="px-5 py-2 rounded-full border border-rose-200 text-rose-700 hover:bg-rose-50 font-bold text-xs transition flex items-center gap-2 shadow-sm"
           >
-            <span>Follow @sheandshe.kidswear</span>
+            <span>Follow @she_n_she_kids_wear</span>
             <span>↗</span>
           </a>
         </div>
 
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3">
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          </a>
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          </a>
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 3" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          </a>
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 4" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          </a>
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 5" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
-          <div class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative">
+          </a>
+          <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
             <img src="https://images.unsplash.com/photo-1471286174890-9c112ffca56a?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 6" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
-          </div>
+          </a>
         </div>
 
       </div>
@@ -211,6 +211,7 @@ export function renderFooter() {
               <div>${STORE_INFO.address}</div>
               <div>Phone: <a href="tel:+918824844263" class="text-white hover:text-rose-400 font-bold transition">+91 88248 44263</a></div>
               <div>Email: <a href="mailto:${STORE_INFO.email}" class="text-rose-400 font-medium hover:underline">${STORE_INFO.email}</a></div>
+              <div>Instagram: <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="text-rose-400 font-medium hover:underline flex items-center gap-1 inline-flex"><span>${STORE_INFO.instagramHandle || '@she_n_she_kids_wear'}</span> <span>↗</span></a></div>
             </div>
           </div>
 

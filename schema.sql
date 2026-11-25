@@ -509,6 +509,8 @@ VALUES
         "placeId": "ChIJm5TT8Ly1bzkKujJkyoTRezM",
         "cid": "3709804868270142138",
         "coords": {"lat": 25.1580017, "lng": 75.8273144},
+        "instagram": "https://www.instagram.com/she_n_she_kids_wear?utm_source=ig_web_button_share_sheet&cnvx=ZDNlZDc0MzIxNw==",
+        "instagramHandle": "@she_n_she_kids_wear",
         "announcement": "",
         "freeShippingThreshold": 999,
         "shippingFee": 99,

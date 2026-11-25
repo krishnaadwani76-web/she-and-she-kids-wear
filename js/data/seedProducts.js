@@ -471,5 +471,7 @@ export const STORE_INFO = {
   placeUrl: "https://www.google.com/maps/place/She+%26+She+kids+wear/@25.1580017,75.8273144,17z/data=!4m6!3m5!1s0x396f85bcf0d3948b:0x337bd124ca6432ba!8m2!3d25.1580017!4d75.8273144!16s%2Fg%2F11y1zq1z1z",
   cid: "3709804868270142138",
   placeId: "ChIJm5TT8Ly1bzkKujJkyoTRezM",
-  coords: { lat: 25.1580017, lng: 75.8273144 }
+  coords: { lat: 25.1580017, lng: 75.8273144 },
+  instagram: "https://www.instagram.com/she_n_she_kids_wear?utm_source=ig_web_button_share_sheet&cnvx=ZDNlZDc0MzIxNw==",
+  instagramHandle: "@she_n_she_kids_wear"
 };

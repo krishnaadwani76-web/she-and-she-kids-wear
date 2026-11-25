@@ -3,12 +3,12 @@
  * Complete back-office management for products, categories, orders, website content, and Supabase cloud.
  */
 
-import { db } from "./db.js?v=2.6";
-import { formatCurrency, formatDate } from "./utils/formatters.js?v=2.6";
-import { showToast } from "./utils/toast.js?v=2.6";
-import { SIZE_LIST } from "./data/seedProducts.js?v=2.6";
-import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=2.6";
-import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=2.6";
+import { db } from "./db.js?v=2.7";
+import { formatCurrency, formatDate } from "./utils/formatters.js?v=2.7";
+import { showToast } from "./utils/toast.js?v=2.7";
+import { SIZE_LIST } from "./data/seedProducts.js?v=2.7";
+import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=2.7";
+import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=2.7";
 
 // Admin application state
 const adminState = {
@@ -1196,6 +1196,16 @@ function renderContentTab(container) {
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-300 mb-1">Instagram Profile URL</label>
+              <input
+                type="text"
+                id="content-instagram-url"
+                value="${settings.storeInfo?.instagram || 'https://www.instagram.com/she_n_she_kids_wear?utm_source=ig_web_button_share_sheet&cnvx=ZDNlZDc0MzIxNw=='}"
+                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
           </div>
         </div>
 
@@ -1258,7 +1268,9 @@ function renderContentTab(container) {
         phone: document.getElementById("content-phone").value,
         whatsapp: document.getElementById("content-whatsapp").value,
         address: document.getElementById("content-address").value,
-        mapsUrl: document.getElementById("content-maps-url").value
+        mapsUrl: document.getElementById("content-maps-url").value,
+        instagram: document.getElementById("content-instagram-url")?.value || current.storeInfo?.instagram || 'https://www.instagram.com/she_n_she_kids_wear?utm_source=ig_web_button_share_sheet&cnvx=ZDNlZDc0MzIxNw==',
+        instagramHandle: "@she_n_she_kids_wear"
       }
     };
 
