@@ -9,7 +9,8 @@ import { db } from "../db.js";
 export function renderHero() {
   const settings = db.getSettings();
 
-  const heroHeading = settings.heroHeading || "Making Every Childhood";
+  const rawHeading = settings.heroHeading || "Making Every Childhood";
+  const displayHeading = rawHeading.replace(/More Stylish\.?/gi, "").trim();
   const heroSubtitle =
     settings.heroSubtitle ||
     "Discover adorable outfits for every little moment. From royal festive frocks and dapper kurta sets to everyday organic playwear — crafted with pure breathable fabrics for happy, active kids.";
@@ -38,7 +39,7 @@ export function renderHero() {
             </div>
 
             <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-              ${heroHeading.includes(".") ? heroHeading.replace(".", "") : heroHeading}
+              ${displayHeading || "Making Every Childhood"}
               <span class="block bg-gradient-to-r from-rose-600 via-pink-600 to-amber-600 bg-clip-text text-transparent italic">
                 More Stylish.
               </span>
