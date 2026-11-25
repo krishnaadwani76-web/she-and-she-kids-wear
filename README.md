@@ -2,7 +2,7 @@
 
 > **"Making Every Childhood More Stylish"**  
 > Premium, comfortable, and affordable clothing for children aged 1–16 years.  
-> **Physical Boutique:** Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan - 324009, India.  
+> **Physical Boutique:** Sethiya Complex, Dadabari, Kota, Rajasthan - 324009, India.  
 > **Live Website:** [https://krishnaadwani76-web.github.io/she-and-she-kids-wear/](https://krishnaadwani76-web.github.io/she-and-she-kids-wear/)  
 > **Admin Dashboard:** [https://krishnaadwani76-web.github.io/she-and-she-kids-wear/admin.html](https://krishnaadwani76-web.github.io/she-and-she-kids-wear/admin.html)
 

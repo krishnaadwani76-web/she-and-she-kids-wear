@@ -1182,7 +1182,7 @@ function renderContentTab(container) {
               <input
                 type="text"
                 id="content-address"
-                value="${settings.storeInfo?.address || 'Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan, India - 324009'}"
+                value="${settings.storeInfo?.address || 'Sethiya Complex, Dadabari, Kota, Rajasthan, India - 324009'}"
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>
@@ -1192,7 +1192,7 @@ function renderContentTab(container) {
               <input
                 type="text"
                 id="content-maps-url"
-                value="${settings.storeInfo?.mapsUrl || 'https://www.google.com/maps/search/?api=1&query=Dadabari,+Kota,+Rajasthan,+India'}"
+                value="${settings.storeInfo?.mapsUrl || 'https://www.google.com/maps/dir//She+%26+She+kids+wear,+she+n+she,+sethiya+complex,+Dadabari,+Kota,+Rajasthan+324009/@25.1580017,75.8273144,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x396f85bcf0d3948b:0x337bd124ca6432ba!2m2!1d75.8273144!2d25.1580017'}"
                 class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
               />
             </div>

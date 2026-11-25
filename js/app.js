@@ -19,7 +19,7 @@ import { renderProductModal } from "./components/productModal.js";
 import { renderCartDrawer, setAppliedCoupon, getAppliedCoupon } from "./components/cartDrawer.js";
 import { renderCheckoutModal, renderOrderSuccessView } from "./components/checkoutModal.js";
 import { renderOrderTrackingModal, buildTrackingTimelineHTML } from "./components/orderTracking.js";
-import { renderContactSection } from "./components/contactSection.js";
+import { renderContactSection, initContactMap } from "./components/contactSection.js";
 import { renderAdminLoginModal, renderAdminDashboard } from "./components/adminPanel.js";
 import { renderFooter } from "./components/footer.js";
 
@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 function initApp() {
   renderMainShell();
   setupEventListeners();
+  initContactMap();
   handleHashChange();
   window.addEventListener("hashchange", handleHashChange);
 
@@ -1432,7 +1433,7 @@ function openPolicyModal(policyType) {
       content: `
         <p>Founded with a mother's love in Dadabari, Kota, <strong>She & She Kids Wear</strong> is Rajasthan's premier boutique destination for children's festive, party, and casual fashion.</p>
         <p>We noticed that most kids' party dresses looked dazzling on hangers but caused itching and tears within 15 minutes because of harsh synthetic underskirts. We changed that: <strong>Every She & She garment is tailored with 100% hypoallergenic, breathable cotton lining</strong>.</p>
-        <p>Visit our flagship showroom at Plot 14, Main Dadabari Circle, Kota or enjoy express door-step delivery anywhere in India.</p>
+        <p>Visit our flagship showroom at Sethiya Complex, Dadabari, Kota or enjoy express door-step delivery anywhere in India.</p>
       `
     }
   };

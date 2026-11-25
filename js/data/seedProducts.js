@@ -465,8 +465,11 @@ export const STORE_INFO = {
   whatsappDefaultMsg: "Hi, I am interested in your kids' wear collection.",
   whatsappUrl: "https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection.",
   email: "care@sheandshekidswear.com",
-  address: "Plot 14, Main Dadabari Circle, Dadabari, Kota, Rajasthan, India - 324009",
+  address: "Sethiya Complex, Dadabari, Kota, Rajasthan, India - 324009",
   timings: "Monday – Saturday: 10:30 AM – 9:00 PM | Sunday: 11:00 AM – 8:00 PM",
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Dadabari,+Kota,+Rajasthan,+India",
-  coords: { lat: 25.1583, lng: 75.8427 }
+  mapsUrl: "https://www.google.com/maps/dir//She+%26+She+kids+wear,+she+n+she,+sethiya+complex,+Dadabari,+Kota,+Rajasthan+324009/@25.1580017,75.8273144,17z/data=!4m8!4m7!1m0!1m5!1m1!1s0x396f85bcf0d3948b:0x337bd124ca6432ba!2m2!1d75.8273144!2d25.1580017",
+  placeUrl: "https://www.google.com/maps/place/She+%26+She+kids+wear/@25.1580017,75.8273144,17z/data=!4m6!3m5!1s0x396f85bcf0d3948b:0x337bd124ca6432ba!8m2!3d25.1580017!4d75.8273144!16s%2Fg%2F11y1zq1z1z",
+  cid: "3709804868270142138",
+  placeId: "ChIJm5TT8Ly1bzkKujJkyoTRezM",
+  coords: { lat: 25.1580017, lng: 75.8273144 }
 };

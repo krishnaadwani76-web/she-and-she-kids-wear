@@ -110,10 +110,11 @@ class StoreDB {
       };
       localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(settings));
     } else {
-      // Auto-migrate any cached old phone numbers in existing localStorage
+      // Auto-migrate any cached old phone numbers or old store address in existing localStorage
       try {
         const storedSettings = JSON.parse(localStorage.getItem(DB_KEYS.SETTINGS) || "null");
         if (storedSettings && storedSettings.storeInfo) {
+          let needsUpdate = false;
           if (
             !storedSettings.storeInfo.phone ||
             storedSettings.storeInfo.phone.includes("98290") ||
@@ -123,11 +124,30 @@ class StoreDB {
             storedSettings.storeInfo.whatsapp = "+918824844263";
             storedSettings.storeInfo.whatsappClean = "918824844263";
             storedSettings.storeInfo.whatsappUrl = "https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection.";
+            needsUpdate = true;
+          }
+
+          if (
+            !storedSettings.storeInfo.address ||
+            storedSettings.storeInfo.address.includes("Plot 14") ||
+            !storedSettings.storeInfo.cid ||
+            !storedSettings.storeInfo.mapsUrl?.includes("sethiya")
+          ) {
+            storedSettings.storeInfo.address = STORE_INFO.address;
+            storedSettings.storeInfo.mapsUrl = STORE_INFO.mapsUrl;
+            storedSettings.storeInfo.placeUrl = STORE_INFO.placeUrl;
+            storedSettings.storeInfo.cid = STORE_INFO.cid;
+            storedSettings.storeInfo.placeId = STORE_INFO.placeId;
+            storedSettings.storeInfo.coords = STORE_INFO.coords;
+            needsUpdate = true;
+          }
+
+          if (needsUpdate) {
             localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(storedSettings));
           }
         }
       } catch (e) {
-        console.warn("Could not check settings phone migration:", e);
+        console.warn("Could not check settings phone/address migration:", e);
       }
     }
 

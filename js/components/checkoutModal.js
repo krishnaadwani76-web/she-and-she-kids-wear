@@ -111,7 +111,7 @@ export function renderCheckoutModal() {
                     type="text"
                     id="checkout-address"
                     required
-                    placeholder="e.g. Plot 14, Near Dadabari Circle"
+                    placeholder="e.g. Near Sethiya Complex, Dadabari"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-rose-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-rose-400"
                   />
                 </div>

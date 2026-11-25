@@ -1,11 +1,12 @@
 /**
  * Contact Us & Dadabari Kota Store Location Component
- * Features embedded Google Maps, Get Directions, direct WhatsApp support,
- * operating hours, and active inquiry form.
+ * Features Google Maps Platform integration, exact shop marker pin,
+ * directions link, WhatsApp concierge, operating hours, and active inquiry form.
  */
 
 import { STORE_INFO } from "../data/seedProducts.js";
 import { showToast } from "../utils/toast.js";
+import { initStoreMap } from "../utils/googleMaps.js";
 
 export function renderContactSection() {
   return `
@@ -21,7 +22,7 @@ export function renderContactSection() {
             We Would Love to Meet You & Your Little Ones
           </h2>
           <p class="text-sm sm:text-base text-slate-600">
-            Have questions about sizes, custom party wear, or your recent order? Get in touch or visit our retail store in Dadabari, Kota.
+            Have questions about sizes, custom party wear, or your recent order? Get in touch or visit our retail store at Sethiya Complex, Dadabari, Kota.
           </p>
         </div>
 
@@ -48,7 +49,8 @@ export function renderContactSection() {
                 </div>
                 <div>
                   <div class="font-bold text-slate-900 text-xs mb-0.5">Store Address:</div>
-                  <div>${STORE_INFO.address}</div>
+                  <div class="font-medium text-slate-800">${STORE_INFO.address}</div>
+                  <div class="text-[11px] text-rose-600 mt-1 font-semibold">Landmark: Sethiya Complex • Dadabari Circle (PIN: 324009)</div>
                 </div>
               </div>
 
@@ -78,7 +80,7 @@ export function renderContactSection() {
               <!-- WhatsApp Direct Action Button -->
               <div class="pt-2">
                 <a
-                  href="https://wa.me/918824844263?text=Hi%2C%20I%20am%20interested%20in%20your%20kids'%20wear%20collection."
+                  href="${STORE_INFO.whatsappUrl}"
                   target="_blank"
                   rel="noopener noreferrer"
                   class="w-full py-3.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-lg shadow-emerald-200 transition flex items-center justify-center gap-2 group"
@@ -92,8 +94,8 @@ export function renderContactSection() {
             <!-- Get Directions Button -->
             <div class="p-5 rounded-3xl bg-amber-50/60 border border-amber-200 flex items-center justify-between">
               <div>
-                <div class="font-bold text-xs text-amber-900">Visiting from outside Kota?</div>
-                <div class="text-[11px] text-amber-700">Located near Dadabari Circle with convenient parking.</div>
+                <div class="font-bold text-xs text-amber-900">Visiting our Kota Boutique?</div>
+                <div class="text-[11px] text-amber-700">Located at Sethiya Complex, Dadabari with easy parking.</div>
               </div>
               <a
                 href="${STORE_INFO.mapsUrl}"
@@ -110,25 +112,65 @@ export function renderContactSection() {
           <!-- Right: Interactive Google Map & Inquiry Form -->
           <div class="lg:col-span-7 space-y-6">
             
-            <!-- Embedded Google Map -->
-            <div id="store-location" class="rounded-3xl overflow-hidden shadow-xl border border-rose-100 bg-white">
-              <div class="px-5 py-3.5 bg-rose-50/60 border-b border-rose-100 flex items-center justify-between">
-                <span class="font-serif font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
-                  <span class="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse"></span>
-                  She & She Kids Wear • Dadabari, Kota (Rajasthan)
+            <!-- Embedded Google Map with Accurate Shop Marker Pin -->
+            <div id="store-location" class="rounded-3xl overflow-hidden shadow-xl border border-rose-100 bg-white flex flex-col">
+              <div class="px-5 py-3.5 bg-rose-50/70 border-b border-rose-100 flex flex-wrap items-center justify-between gap-2">
+                <span class="font-serif font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-2">
+                  <span class="relative flex h-2.5 w-2.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-600"></span>
+                  </span>
+                  <span>She & She kids wear • Sethiya Complex, Dadabari, Kota</span>
                 </span>
-                <span class="text-[11px] font-bold text-rose-600">PIN: 324009</span>
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[10px] font-bold">📍 Official Marker Pin</span>
+                  <span class="text-[11px] font-bold text-rose-600">PIN: 324009</span>
+                </div>
               </div>
               
-              <div class="aspect-[16/9] w-full bg-slate-100 relative">
-                <iframe
-                  title="She & She Kids Wear Store Location"
-                  src="https://maps.google.com/maps?q=Dadabari,%20Kota,%20Rajasthan&t=&z=14&ie=UTF8&iwloc=&output=embed"
-                  class="w-full h-full border-0"
-                  allowfullscreen=""
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
+              <div class="relative w-full h-[380px] sm:h-[440px] bg-slate-100">
+                <div id="store-map-canvas" class="w-full h-full">
+                  <iframe
+                    title="She & She Kids Wear Store Location - Sethiya Complex, Dadabari, Kota"
+                    src="https://maps.google.com/maps?cid=3709804868270142138&t=&z=17&ie=UTF8&iwloc=&output=embed"
+                    class="w-full h-full border-0"
+                    allowfullscreen=""
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+
+                <!-- Floating Interactive Shop Location Pill -->
+                <div class="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-md bg-white/95 backdrop-blur-md p-3.5 rounded-2xl border border-rose-100 shadow-xl shadow-rose-950/10 flex flex-col gap-2">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2">
+                      <span class="text-base">📍</span>
+                      <div>
+                        <div class="font-bold text-xs text-slate-900">Sethiya Complex, Dadabari, Kota</div>
+                        <div class="text-[10px] text-slate-500 font-mono">25.1580° N, 75.8273° E</div>
+                      </div>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 font-bold shrink-0">Open Today</span>
+                  </div>
+                  <div class="flex items-center gap-2 pt-1 border-t border-slate-100">
+                    <a
+                      href="${STORE_INFO.mapsUrl}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="flex-1 py-1.5 px-3 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] text-center shadow-sm transition"
+                    >
+                      Get Directions ↗
+                    </a>
+                    <a
+                      href="${STORE_INFO.placeUrl}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="py-1.5 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] text-center transition"
+                    >
+                      Open in Maps ↗
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -202,4 +244,15 @@ export function renderContactSection() {
       </div>
     </section>
   `;
+}
+
+/**
+ * Initializes interactive Google Maps features if window.GOOGLE_MAPS_API_KEY is available.
+ */
+export function initContactMap() {
+  if (typeof window !== "undefined" && (window.GOOGLE_MAPS_API_KEY || localStorage.getItem("GOOGLE_MAPS_API_KEY"))) {
+    initStoreMap("store-map-canvas").catch(err => {
+      console.warn("[Contact Map] Google Maps API load deferred:", err);
+    });
+  }
 }
