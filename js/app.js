@@ -1175,7 +1175,7 @@ function openAdminLoginModal() {
     mount.innerHTML = "";
   });
 
-  mount.querySelector("#admin-login-form")?.addEventListener("submit", async (e) => {
+  mount.querySelector("#admin-login-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     const email = mount.querySelector("#admin-email-input")?.value;
     const pass = mount.querySelector("#admin-password-input")?.value;
@@ -1184,18 +1184,18 @@ function openAdminLoginModal() {
     if (res.success) {
       showToast("Welcome back, Administrator!", "success");
       mount.innerHTML = "";
-      await openAdminDashboard();
+      openAdminDashboard();
     } else {
       showToast(res.message, "error");
     }
   });
 }
 
-async function openAdminDashboard() {
+function openAdminDashboard() {
   const mount = document.getElementById("admin-panel-mount");
   if (!mount) return;
 
-  await db.getOrdersAsync();
+  db.getOrdersAsync().catch(() => {});
   mount.innerHTML = renderAdminDashboard();
 
   // Close & Logout buttons
