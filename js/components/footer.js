@@ -145,7 +145,7 @@ export function renderFooter() {
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
           </a>
           <a href="${STORE_INFO.instagram}" target="_blank" rel="noopener noreferrer" class="aspect-square rounded-2xl overflow-hidden bg-rose-50 group relative block">
-            <img src="https://images.unsplash.com/photo-1471286174890-9c112ffca56a?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 6" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+            <img src="https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=400&q=80" alt="Insta Kid 6" class="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
             <div class="absolute inset-0 bg-rose-600/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xl">♥</div>
           </a>
         </div>
