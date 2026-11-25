@@ -4,24 +4,24 @@
  * checkout flow, Razorpay gateway, and admin control.
  */
 
-import { db } from "./db.js";
-import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js";
-import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js";
-import { showToast } from "./utils/toast.js";
-import { initiateRazorpayPayment } from "./utils/razorpay.js";
-import { setCanonicalUrl, applyRouteMetadata, applyProductMetadata } from "./utils/seo.js";
+import { db } from "./db.js?v=2.6";
+import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js?v=2.6";
+import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js?v=2.6";
+import { showToast } from "./utils/toast.js?v=2.6";
+import { initiateRazorpayPayment } from "./utils/razorpay.js?v=2.6";
+import { setCanonicalUrl, applyRouteMetadata, applyProductMetadata } from "./utils/seo.js?v=2.6";
 
 // Components
-import { renderHeader } from "./components/header.js";
-import { renderHero } from "./components/hero.js";
-import { renderProductCard } from "./components/productCard.js";
-import { renderProductModal } from "./components/productModal.js";
-import { renderCartDrawer, setAppliedCoupon, getAppliedCoupon } from "./components/cartDrawer.js";
-import { renderCheckoutModal, renderOrderSuccessView } from "./components/checkoutModal.js";
-import { renderOrderTrackingModal, buildTrackingTimelineHTML } from "./components/orderTracking.js";
-import { renderContactSection, initContactMap } from "./components/contactSection.js";
-import { renderAdminLoginModal, renderAdminDashboard } from "./components/adminPanel.js";
-import { renderFooter } from "./components/footer.js";
+import { renderHeader } from "./components/header.js?v=2.6";
+import { renderHero } from "./components/hero.js?v=2.6";
+import { renderProductCard } from "./components/productCard.js?v=2.6";
+import { renderProductModal } from "./components/productModal.js?v=2.6";
+import { renderCartDrawer, setAppliedCoupon, getAppliedCoupon } from "./components/cartDrawer.js?v=2.6";
+import { renderCheckoutModal, renderOrderSuccessView } from "./components/checkoutModal.js?v=2.6";
+import { renderOrderTrackingModal, buildTrackingTimelineHTML } from "./components/orderTracking.js?v=2.6";
+import { renderContactSection, initContactMap } from "./components/contactSection.js?v=2.6";
+import { renderAdminLoginModal, renderAdminDashboard } from "./components/adminPanel.js?v=2.6";
+import { renderFooter } from "./components/footer.js?v=2.6";
 
 // Application State
 const state = {
@@ -67,6 +67,13 @@ function initApp() {
       if (headerMount) headerMount.innerHTML = renderHeader();
       const heroMount = document.getElementById("hero-mount");
       if (heroMount) heroMount.innerHTML = renderHero();
+      const contactMount = document.getElementById("contact-mount");
+      if (contactMount) {
+        contactMount.innerHTML = renderContactSection();
+        initContactMap();
+      }
+      const footerMount = document.getElementById("footer-mount");
+      if (footerMount) footerMount.innerHTML = renderFooter();
     }
   });
 }
@@ -237,10 +244,14 @@ function renderMainShell() {
       </section>
 
       <!-- Contact Us & Dadabari Kota Store Section -->
-      ${renderContactSection()}
+      <div id="contact-mount">
+        ${renderContactSection()}
+      </div>
 
       <!-- Reviews, Instagram & Footer -->
-      ${renderFooter()}
+      <div id="footer-mount">
+        ${renderFooter()}
+      </div>
     </main>
 
     <!-- Modal Containers Mounts -->
@@ -1041,7 +1052,7 @@ function openCheckoutModal() {
           });
 
           // Payment success - save verified order
-          const createdOrder = db.createOrder({
+          const createdOrder = await db.createOrderAsync({
             customer,
             items: cart,
             subtotal: summary.subtotal,
@@ -1065,7 +1076,7 @@ function openCheckoutModal() {
       } else {
         // Cash on Delivery or Direct Store UPI
         const methodLabel = selectedPayment === "cod" ? "Cash on Delivery (COD)" : "Store UPI (Dadabari)";
-        const createdOrder = db.createOrder({
+        const createdOrder = await db.createOrderAsync({
           customer,
           items: cart,
           subtotal: summary.subtotal,
@@ -1230,20 +1241,20 @@ function openAdminDashboard() {
 
   // Order Status Change Selector
   mount.querySelectorAll(".admin-order-status-select").forEach((select) => {
-    select.addEventListener("change", (e) => {
+    select.addEventListener("change", async (e) => {
       const orderId = e.target.dataset.orderId;
       const newStatus = e.target.value;
-      db.updateOrderStatus(orderId, newStatus);
+      await db.updateOrderStatusAsync(orderId, newStatus);
       showToast(`Order ${orderId} updated to ${newStatus}.`, "success");
     });
   });
 
   // Delete Product
   mount.querySelectorAll(".admin-delete-product-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", async () => {
       const prodId = btn.dataset.id;
       if (confirm("Are you sure you want to delete this product from store?")) {
-        db.deleteProduct(prodId);
+        await db.deleteProductAsync(prodId);
         showToast("Product deleted.", "info");
         openAdminDashboard();
       }
@@ -1315,7 +1326,7 @@ function openAdminDashboard() {
   });
 
   // Save Product Form
-  mount.querySelector("#product-editor-form")?.addEventListener("submit", (e) => {
+  mount.querySelector("#product-editor-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const editId = mount.querySelector("#edit-product-id")?.value;
     const checkedSizes = Array.from(mount.querySelectorAll('input[name="product-size-check"]:checked')).map(
@@ -1347,21 +1358,21 @@ function openAdminDashboard() {
       description: mount.querySelector("#form-product-desc")?.value.trim()
     };
 
-    db.saveProduct(productData);
+    await db.saveProductAsync(productData);
     showToast(editId ? "Product updated successfully!" : "New product published!", "success");
     if (productFormModal) productFormModal.classList.add("hidden");
     openAdminDashboard();
   });
 
   // Settings Form Save
-  mount.querySelector("#admin-settings-form")?.addEventListener("submit", (e) => {
+  mount.querySelector("#admin-settings-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const rzpKey = mount.querySelector("#settings-razorpay-key")?.value.trim();
     const announcement = mount.querySelector("#settings-announcement")?.value.trim();
     const freeShip = parseFloat(mount.querySelector("#settings-free-shipping")?.value);
     const shipFee = parseFloat(mount.querySelector("#settings-shipping-fee")?.value);
 
-    db.updateSettings({
+    await db.updateSettingsAsync({
       razorpayKeyId: rzpKey,
       announcement,
       freeShippingThreshold: freeShip,

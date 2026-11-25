@@ -3,7 +3,7 @@
  * Provides live PostgreSQL connectivity, Supabase Auth, and Cloud Storage for product photos.
  */
 
-import { getSupabaseConfig, isSupabaseConfigured } from "./config.js";
+import { getSupabaseConfig, isSupabaseConfigured } from "./config.js?v=2.6";
 
 let supabaseInstance = null;
 let supabaseSdk = null;
