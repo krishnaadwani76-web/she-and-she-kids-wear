@@ -1175,7 +1175,7 @@ function openAdminLoginModal() {
     mount.innerHTML = "";
   });
 
-  mount.querySelector("#admin-login-form")?.addEventListener("submit", (e) => {
+  mount.querySelector("#admin-login-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = mount.querySelector("#admin-email-input")?.value;
     const pass = mount.querySelector("#admin-password-input")?.value;
