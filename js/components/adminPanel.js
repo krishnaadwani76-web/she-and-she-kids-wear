@@ -263,7 +263,16 @@ export function renderAdminDashboard() {
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-rose-50">
-                    ${orders
+                    ${orders.length === 0 ? `
+                      <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-500">
+                          <div class="space-y-1">
+                            <div class="text-sm font-semibold text-slate-800">No customer orders found in database</div>
+                            <div class="text-xs text-slate-400">All demo orders have been purged. Real orders placed by customers will appear here in real time.</div>
+                          </div>
+                        </td>
+                      </tr>
+                    ` : orders
                       .map(
                         (ord) => `
                       <tr class="hover:bg-rose-50/20">
@@ -322,7 +331,16 @@ export function renderAdminDashboard() {
                     </tr>
                   </thead>
                   <tbody class="divide-y divide-rose-50">
-                    ${customers
+                    ${customers.length === 0 ? `
+                      <tr>
+                        <td colspan="5" class="p-8 text-center text-slate-500">
+                          <div class="space-y-1">
+                            <div class="text-sm font-semibold text-slate-800">No customer records yet</div>
+                            <div class="text-xs text-slate-400">When customers place their first order, their profile and contact details will be saved here automatically.</div>
+                          </div>
+                        </td>
+                      </tr>
+                    ` : customers
                       .map(
                         (c) => `
                       <tr class="hover:bg-rose-50/20">

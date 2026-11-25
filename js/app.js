@@ -1184,17 +1184,18 @@ function openAdminLoginModal() {
     if (res.success) {
       showToast("Welcome back, Administrator!", "success");
       mount.innerHTML = "";
-      openAdminDashboard();
+      await openAdminDashboard();
     } else {
       showToast(res.message, "error");
     }
   });
 }
 
-function openAdminDashboard() {
+async function openAdminDashboard() {
   const mount = document.getElementById("admin-panel-mount");
   if (!mount) return;
 
+  await db.getOrdersAsync();
   mount.innerHTML = renderAdminDashboard();
 
   // Close & Logout buttons

@@ -1508,6 +1508,32 @@ class StoreDB {
     }
   }
 
+  exportDatabase() {
+    const backup = {
+      version: "2.0.0",
+      exportedAt: new Date().toISOString(),
+      products: this.getProducts(),
+      categories: this.getCategories(),
+      orders: this.getOrders(),
+      customers: this.getCustomers(),
+      inquiries: this.getInquiries(),
+      subscribers: this.getNewsletterSubscribers(),
+      settings: this.getSettings()
+    };
+    return JSON.stringify(backup, null, 2);
+  }
+
+  resetDatabase() {
+    localStorage.setItem(DB_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
+    localStorage.setItem(DB_KEYS.CATEGORIES, JSON.stringify(INITIAL_CATEGORIES));
+    localStorage.setItem(DB_KEYS.SETTINGS, JSON.stringify(INITIAL_SETTINGS));
+    localStorage.setItem(DB_KEYS.ORDERS, JSON.stringify([]));
+    localStorage.setItem(DB_KEYS.CUSTOMERS, JSON.stringify([]));
+    this.cleanseDemoData();
+    this.notifyChange("all");
+    return true;
+  }
+
   /* ------------------- INQUIRIES & CONTACT ------------------- */
   getInquiries() {
     try {
