@@ -4,7 +4,7 @@
  * and comprehensive Indian e-commerce legal policies.
  */
 
-import { STORE_INFO } from "../data/seedProducts.js?v=3.0";
+import { STORE_INFO } from "../data/seedProducts.js?v=3.1";
 
 export function renderFooter() {
   return `

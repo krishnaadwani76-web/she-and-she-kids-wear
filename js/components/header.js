@@ -186,22 +186,12 @@ export function renderHeader() {
               <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
               <span>Party Wear</span>
             </a>
-            <a href="#category/casual" class="nav-link hover:text-rose-600 transition flex items-center gap-1.5 py-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              <span>Casual Wear</span>
-            </a>
             <a href="#new-arrivals" class="nav-link text-rose-600 hover:text-rose-700 transition flex items-center gap-1.5 py-1 font-bold">
               <span>✨ New Arrivals</span>
-            </a>
-            <a href="#best-sellers" class="nav-link hover:text-rose-600 transition flex items-center gap-1.5 py-1">
-              <span>Best Sellers</span>
             </a>
           </div>
 
           <div class="flex items-center space-x-6 text-[11px] font-bold">
-            <a href="#size-guide" class="text-slate-500 hover:text-rose-600 transition">
-              Size Chart (1–16Y)
-            </a>
             <a href="#contact" class="text-rose-600 hover:text-rose-700 transition flex items-center gap-1">
               <span>Contact & Store</span>
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -239,14 +229,8 @@ export function renderHeader() {
             <a href="#category/party" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-800 font-semibold hover:bg-rose-50 hover:text-rose-600">
               <span>✨ Party & Festive Wear</span>
             </a>
-            <a href="#category/casual" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-800 font-semibold hover:bg-rose-50 hover:text-rose-600">
-              <span>👕 Casual Daywear</span>
-            </a>
             <a href="#new-arrivals" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-rose-600 font-bold hover:bg-rose-50">
               <span>🔥 New Arrivals</span>
-            </a>
-            <a href="#best-sellers" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-800 font-semibold hover:bg-rose-50 hover:text-rose-600">
-              <span>⭐ Best Sellers</span>
             </a>
             <a href="#contact" class="mobile-nav-link flex items-center gap-3 px-4 py-3 rounded-2xl text-slate-800 font-semibold hover:bg-rose-50 hover:text-rose-600">
               <span>📍 Store & Contact Us</span>

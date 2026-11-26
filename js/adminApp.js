@@ -3,12 +3,12 @@
  * Complete back-office management for products, categories, orders, website content, and Supabase cloud.
  */
 
-import { db } from "./db.js?v=3.0";
-import { formatCurrency, formatDate } from "./utils/formatters.js?v=3.0";
-import { showToast } from "./utils/toast.js?v=3.0";
-import { SIZE_LIST } from "./data/seedProducts.js?v=3.0";
-import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=3.0";
-import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=3.0";
+import { db } from "./db.js?v=3.1";
+import { formatCurrency, formatDate } from "./utils/formatters.js?v=3.1";
+import { showToast } from "./utils/toast.js?v=3.1";
+import { SIZE_LIST } from "./data/seedProducts.js?v=3.1";
+import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=3.1";
+import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=3.1";
 
 // Admin application state
 const adminState = {
