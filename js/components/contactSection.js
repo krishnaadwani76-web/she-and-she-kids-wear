@@ -4,9 +4,9 @@
  * directions link, WhatsApp concierge, operating hours, and active inquiry form.
  */
 
-import { STORE_INFO } from "../data/seedProducts.js?v=3.1";
-import { showToast } from "../utils/toast.js?v=3.1";
-import { initStoreMap } from "../utils/googleMaps.js?v=3.1";
+import { STORE_INFO } from "../data/seedProducts.js?v=3.2";
+import { showToast } from "../utils/toast.js?v=3.2";
+import { initStoreMap } from "../utils/googleMaps.js?v=3.2";
 
 export function renderContactSection() {
   return `
@@ -15,9 +15,6 @@ export function renderContactSection() {
         
         <!-- Section Header -->
         <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
-          <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rose-100 text-rose-700 text-xs font-bold uppercase tracking-wider">
-            <span>📍 Visit Our Kota Boutique</span>
-          </div>
           <h2 class="font-serif text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             We Would Love to Meet You & Your Little Ones
           </h2>

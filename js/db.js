@@ -7,9 +7,9 @@
  * Full CRUD operations for Products, Categories, Orders, Customers, and Website Settings.
  */
 
-import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=3.1";
-import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=3.1";
-import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=3.1";
+import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=3.2";
+import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=3.2";
+import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=3.2";
 
 export const DB_KEYS = {
   PRODUCTS: "sskw_products_v1",
