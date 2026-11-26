@@ -4,24 +4,24 @@
  * checkout flow, Razorpay gateway, and admin control.
  */
 
-import { db } from "./db.js?v=2.9";
-import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js?v=2.9";
-import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js?v=2.9";
-import { showToast } from "./utils/toast.js?v=2.9";
-import { initiateRazorpayPayment } from "./utils/razorpay.js?v=2.9";
-import { setCanonicalUrl, applyRouteMetadata, applyProductMetadata } from "./utils/seo.js?v=2.9";
+import { db } from "./db.js?v=3.0";
+import { CATEGORIES, SIZE_LIST, STORE_INFO } from "./data/seedProducts.js?v=3.0";
+import { formatCurrency, calculateDiscountPercent } from "./utils/formatters.js?v=3.0";
+import { showToast } from "./utils/toast.js?v=3.0";
+import { initiateRazorpayPayment } from "./utils/razorpay.js?v=3.0";
+import { setCanonicalUrl, applyRouteMetadata, applyProductMetadata } from "./utils/seo.js?v=3.0";
 
 // Components
-import { renderHeader } from "./components/header.js?v=2.9";
-import { renderHero } from "./components/hero.js?v=2.9";
-import { renderProductCard } from "./components/productCard.js?v=2.9";
-import { renderProductModal } from "./components/productModal.js?v=2.9";
-import { renderCartDrawer, setAppliedCoupon, getAppliedCoupon } from "./components/cartDrawer.js?v=2.9";
-import { renderCheckoutModal, renderOrderSuccessView } from "./components/checkoutModal.js?v=2.9";
-import { renderOrderTrackingModal, buildTrackingTimelineHTML } from "./components/orderTracking.js?v=2.9";
-import { renderContactSection, initContactMap } from "./components/contactSection.js?v=2.9";
-import { renderAdminLoginModal, renderAdminDashboard } from "./components/adminPanel.js?v=2.9";
-import { renderFooter } from "./components/footer.js?v=2.9";
+import { renderHeader } from "./components/header.js?v=3.0";
+import { renderHero } from "./components/hero.js?v=3.0";
+import { renderProductCard } from "./components/productCard.js?v=3.0";
+import { renderProductModal } from "./components/productModal.js?v=3.0";
+import { renderCartDrawer, setAppliedCoupon, getAppliedCoupon } from "./components/cartDrawer.js?v=3.0";
+import { renderCheckoutModal, renderOrderSuccessView } from "./components/checkoutModal.js?v=3.0";
+import { renderOrderTrackingModal, buildTrackingTimelineHTML } from "./components/orderTracking.js?v=3.0";
+import { renderContactSection, initContactMap } from "./components/contactSection.js?v=3.0";
+import { renderAdminLoginModal, renderAdminDashboard } from "./components/adminPanel.js?v=3.0";
+import { renderFooter } from "./components/footer.js?v=3.0";
 
 // Application State
 const state = {
