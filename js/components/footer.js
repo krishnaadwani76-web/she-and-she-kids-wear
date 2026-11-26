@@ -1,10 +1,10 @@
 /**
  * Footer, Reviews, Instagram Gallery, and Policy Modals Component
- * Features customer testimonials, social proof, newsletter subscription,
+ * Features customer testimonials, social proof, Instagram gallery,
  * and comprehensive Indian e-commerce legal policies.
  */
 
-import { STORE_INFO } from "../data/seedProducts.js?v=2.8";
+import { STORE_INFO } from "../data/seedProducts.js?v=2.9";
 
 export function renderFooter() {
   return `
@@ -150,37 +150,6 @@ export function renderFooter() {
           </a>
         </div>
 
-      </div>
-    </section>
-
-    <!-- Newsletter Subscription Box -->
-    <section class="py-12 bg-rose-50/70 border-y border-rose-100">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
-        <span class="inline-block px-3 py-1 rounded-full bg-rose-100 text-rose-700 text-[11px] font-bold uppercase tracking-wider">
-          Join the She & She Parents Club
-        </span>
-        <h3 class="font-serif text-2xl sm:text-3xl font-extrabold text-slate-900">
-          Be the First to Know About Festive Drops & Secret Sales
-        </h3>
-        <p class="text-xs text-slate-600 max-w-md mx-auto">
-          Subscribe and receive an instant ₹250 welcome gift voucher for your little boy or girl.
-        </p>
-
-        <form id="newsletter-form" class="flex flex-col sm:flex-row gap-2 max-w-md mx-auto pt-2">
-          <input
-            type="email"
-            id="newsletter-email"
-            required
-            placeholder="Enter your email address..."
-            class="flex-1 px-4 py-3 rounded-2xl border border-rose-200 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-rose-400"
-          />
-          <button
-            type="submit"
-            class="px-6 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-200 transition shrink-0"
-          >
-            Subscribe Now
-          </button>
-        </form>
       </div>
     </section>
 
