@@ -2469,5 +2469,3 @@ async function openOrderModal(orderId) {
     renderActiveTab();
   });
 }
-  });
-}
