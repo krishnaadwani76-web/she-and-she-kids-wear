@@ -4,7 +4,7 @@
  * live order status updates, customer records, and Razorpay settings.
  */
 
-import { db } from "../db.js";
+import { db, ORDER_STATUSES } from "../db.js";
 import { formatCurrency, formatDate } from "../utils/formatters.js";
 import { showToast } from "../utils/toast.js";
 import { SIZE_LIST } from "../data/seedProducts.js";
@@ -294,11 +294,9 @@ export function renderAdminDashboard() {
                             class="admin-order-status-select px-2.5 py-1 rounded-xl border border-rose-200 text-xs font-bold bg-white text-slate-800"
                             data-order-id="${ord.id}"
                           >
-                            <option value="Pending" ${ord.orderStatus === "Pending" ? "selected" : ""}>Pending</option>
-                            <option value="Processing" ${ord.orderStatus === "Processing" ? "selected" : ""}>Processing</option>
-                            <option value="Shipped" ${ord.orderStatus === "Shipped" ? "selected" : ""}>Shipped</option>
-                            <option value="Delivered" ${ord.orderStatus === "Delivered" ? "selected" : ""}>Delivered</option>
-                            <option value="Cancelled" ${ord.orderStatus === "Cancelled" ? "selected" : ""}>Cancelled</option>
+                            ${ORDER_STATUSES.map(st => `
+                              <option value="${st}" ${ord.orderStatus === st ? "selected" : ""}>${st}</option>
+                            `).join("")}
                           </select>
                         </td>
                       </tr>

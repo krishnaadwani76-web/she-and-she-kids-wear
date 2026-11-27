@@ -4,9 +4,9 @@
  * directions link, WhatsApp concierge, operating hours, and active inquiry form.
  */
 
-import { STORE_INFO } from "../data/seedProducts.js?v=3.2";
-import { showToast } from "../utils/toast.js?v=3.2";
-import { initStoreMap } from "../utils/googleMaps.js?v=3.2";
+import { STORE_INFO } from "../data/seedProducts.js?v=3.3";
+import { showToast } from "../utils/toast.js?v=3.3";
+import { initStoreMap } from "../utils/googleMaps.js?v=3.3";
 
 export function renderContactSection() {
   return `

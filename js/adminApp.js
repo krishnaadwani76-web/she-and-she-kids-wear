@@ -3,12 +3,17 @@
  * Complete back-office management for products, categories, orders, website content, and Supabase cloud.
  */
 
-import { db } from "./db.js?v=3.2";
-import { formatCurrency, formatDate } from "./utils/formatters.js?v=3.2";
-import { showToast } from "./utils/toast.js?v=3.2";
-import { SIZE_LIST } from "./data/seedProducts.js?v=3.2";
-import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=3.2";
-import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=3.2";
+import { db, ORDER_STATUSES } from "./db.js?v=3.3";
+import { formatCurrency, formatDate } from "./utils/formatters.js?v=3.3";
+import { showToast } from "./utils/toast.js?v=3.3";
+import { SIZE_LIST } from "./data/seedProducts.js?v=3.3";
+import { isSupabaseConfigured, getSupabaseConfig, saveSupabaseConfig, clearSupabaseConfig } from "./config.js?v=3.3";
+import { optimizeAndUploadImage, testConnection, supabaseSignIn, supabaseSignOut } from "./supabaseClient.js?v=3.3";
+import {
+  generateShippingLabelText,
+  printOrderInvoice,
+  generateCustomerTrackingWhatsAppUrl
+} from "./utils/orderNotification.js?v=3.3";
 
 // Admin application state
 const adminState = {
@@ -335,7 +340,7 @@ async function renderDashboardTab(container) {
   const inquiries = await db.getInquiriesAsync();
   const subscribers = db.getNewsletterSubscribers();
   const totalSales = orders.reduce((sum, o) => sum + (o.total || 0), 0);
-  const pendingOrders = orders.filter(o => o.orderStatus === "Pending" || o.orderStatus === "Processing");
+  const pendingOrders = orders.filter(o => ["New Order", "Pending", "Confirmed", "Processing", "Ready for Shipping"].includes(o.orderStatus));
   const lowStockProducts = products.filter(p => Number(p.stock) < 5);
   const isCloudConnected = isSupabaseConfigured();
 
@@ -570,13 +575,23 @@ async function renderDashboardTab(container) {
 
 function getOrderStatusBadgeClass(status) {
   switch (status) {
-    case "Pending": return "bg-amber-950/80 text-amber-300 border border-amber-800";
-    case "Confirmed": return "bg-blue-950/80 text-blue-300 border border-blue-800";
-    case "Processing": return "bg-purple-950/80 text-purple-300 border border-purple-800";
-    case "Shipped": return "bg-indigo-950/80 text-indigo-300 border border-indigo-800";
-    case "Delivered": return "bg-emerald-950/80 text-emerald-300 border border-emerald-800";
-    case "Cancelled": return "bg-rose-950/80 text-rose-300 border border-rose-800";
-    default: return "bg-slate-800 text-slate-300";
+    case "New Order":
+    case "Pending":
+      return "bg-rose-950/80 text-rose-300 border border-rose-800 animate-pulse";
+    case "Confirmed":
+      return "bg-blue-950/80 text-blue-300 border border-blue-800";
+    case "Processing":
+      return "bg-purple-950/80 text-purple-300 border border-purple-800";
+    case "Ready for Shipping":
+      return "bg-cyan-950/80 text-cyan-300 border border-cyan-800";
+    case "Shipped":
+      return "bg-indigo-950/80 text-indigo-300 border border-indigo-800";
+    case "Delivered":
+      return "bg-emerald-950/80 text-emerald-300 border border-emerald-800";
+    case "Cancelled":
+      return "bg-red-950/80 text-red-400 border border-red-900";
+    default:
+      return "bg-slate-800 text-slate-300";
   }
 }
 
@@ -852,21 +867,48 @@ function renderCategoriesTab(container) {
 async function renderOrdersTab(container) {
   const orders = await db.getOrdersAsync();
   const isCloudConnected = isSupabaseConfigured();
+  const settings = db.getSettings();
+  const storeInfo = settings?.storeInfo || {};
 
   const filtered = orders.filter(o => {
     const matchesStatus = adminState.orderStatusFilter === "all" || o.orderStatus === adminState.orderStatusFilter;
-    const q = adminState.orderSearchQuery.toLowerCase();
+    const q = (adminState.orderSearchQuery || "").toLowerCase();
     const matchesSearch = !q ||
       o.id.toLowerCase().includes(q) ||
-      o.customer.name.toLowerCase().includes(q) ||
-      o.customer.phone.includes(q) ||
-      (o.customer.city && o.customer.city.toLowerCase().includes(q));
+      (o.customer.name && o.customer.name.toLowerCase().includes(q)) ||
+      (o.customer.phone && o.customer.phone.includes(q)) ||
+      (o.customer.email && o.customer.email.toLowerCase().includes(q)) ||
+      (o.customer.pincode && o.customer.pincode.includes(q)) ||
+      (o.customer.city && o.customer.city.toLowerCase().includes(q)) ||
+      (o.items && o.items.some(i => i.name && i.name.toLowerCase().includes(q)));
     return matchesStatus && matchesSearch;
+  });
+
+  const newOrdersCount = orders.filter(o => o.orderStatus === "New Order" || o.orderStatus === "Pending").length;
+  const statusCounts = {};
+  ORDER_STATUSES.forEach(st => {
+    statusCounts[st] = orders.filter(o => o.orderStatus === st).length;
   });
 
   container.innerHTML = `
     <div class="space-y-6">
       
+      <!-- New Order Notification Banner -->
+      ${newOrdersCount > 0 ? `
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-rose-950/40 border border-rose-600/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-200 shadow-xl">
+          <div class="flex items-center gap-3">
+            <span class="w-3.5 h-3.5 rounded-full bg-rose-500 animate-ping shrink-0"></span>
+            <div>
+              <div class="font-bold text-white text-sm">🚨 ${newOrdersCount} New Customer Order${newOrdersCount > 1 ? 's' : ''} Awaiting Attention!</div>
+              <div class="text-[11px] text-rose-300">Action: Verify payment details, copy courier shipping label for booking, pack items, and dispatch.</div>
+            </div>
+          </div>
+          <button class="order-filter-pill px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shrink-0 transition shadow-md" data-status="New Order">
+            View New Orders (${newOrdersCount}) →
+          </button>
+        </div>
+      ` : ''}
+
       <!-- Database Connection Status Badge -->
       ${!isCloudConnected ? `
         <div class="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-200">
@@ -894,12 +936,18 @@ async function renderOrdersTab(container) {
       <!-- Filter Bar -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-slate-950 p-4 rounded-2xl border border-slate-800">
         <div class="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1">
-          ${["all", "Pending", "Processing", "Shipped", "Delivered", "Cancelled"].map(st => `
+          <button
+            class="order-filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition shrink-0 ${adminState.orderStatusFilter === 'all' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'}"
+            data-status="all"
+          >
+            All Orders (${orders.length})
+          </button>
+          ${ORDER_STATUSES.map(st => `
             <button
               class="order-filter-pill px-3 py-1.5 rounded-full text-xs font-bold transition shrink-0 ${adminState.orderStatusFilter === st ? 'bg-rose-600 text-white' : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'}"
               data-status="${st}"
             >
-              ${st === 'all' ? 'All Orders' : st}
+              ${st} ${statusCounts[st] > 0 ? `<span class="ml-1 px-1.5 py-0.2 rounded-full text-[10px] ${st === 'New Order' ? 'bg-rose-500 text-white' : 'bg-slate-800 text-slate-300'} font-black">${statusCounts[st]}</span>` : ''}
             </button>
           `).join("")}
         </div>
@@ -907,7 +955,7 @@ async function renderOrdersTab(container) {
         <input
           type="text"
           id="order-search-input"
-          placeholder="Search by order ID, name, or phone..."
+          placeholder="Search ID, name, phone, PIN, item..."
           value="${adminState.orderSearchQuery}"
           class="px-4 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-rose-500"
         />
@@ -920,7 +968,7 @@ async function renderOrdersTab(container) {
             <thead class="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
               <tr>
                 <th class="px-6 py-3">Order ID & Date</th>
-                <th class="px-6 py-3">Customer & Address</th>
+                <th class="px-6 py-3">Customer & Delivery Address</th>
                 <th class="px-6 py-3">Items Ordered</th>
                 <th class="px-6 py-3">Total Amount</th>
                 <th class="px-6 py-3">Payment</th>
@@ -937,8 +985,12 @@ async function renderOrdersTab(container) {
                   </td>
                   <td class="px-6 py-3.5">
                     <div class="font-bold text-white">${o.customer.name}</div>
-                    <div class="text-[11px] text-slate-400">${o.customer.phone}</div>
-                    <div class="text-[10px] text-slate-500 truncate max-w-xs">${o.customer.address}, ${o.customer.city}</div>
+                    <div class="text-[11px] text-slate-400">
+                      <a href="tel:${o.customer.phone}" class="hover:text-rose-300 font-mono">${o.customer.phone}</a>
+                    </div>
+                    <div class="text-[10px] text-slate-400 truncate max-w-xs mt-0.5" title="${o.customer.address}, ${o.customer.city} - ${o.customer.pincode}">
+                      📍 ${o.customer.address}, ${o.customer.city} - ${o.customer.pincode}
+                    </div>
                   </td>
                   <td class="px-6 py-3.5">
                     <div class="space-y-1">
@@ -956,7 +1008,7 @@ async function renderOrdersTab(container) {
                     <div class="text-[10px] text-slate-500">${o.items.length} items</div>
                   </td>
                   <td class="px-6 py-3.5">
-                    <div class="font-semibold text-white">${o.paymentMethod || 'Razorpay'}</div>
+                    <div class="font-semibold text-white">${o.paymentMethod || 'Cash on Delivery'}</div>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${o.paymentStatus === 'Paid' ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-400'}">
                       ${o.paymentStatus}
                     </span>
@@ -966,7 +1018,7 @@ async function renderOrdersTab(container) {
                       class="order-quick-status-select px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700 text-white text-[11px] font-bold focus:outline-none focus:ring-1 focus:ring-rose-500"
                       data-order-id="${o.id}"
                     >
-                      ${["Pending", "Confirmed", "Processing", "Shipped", "Delivered", "Cancelled"].map(st => `
+                      ${ORDER_STATUSES.map(st => `
                         <option value="${st}" ${o.orderStatus === st ? 'selected' : ''}>${st}</option>
                       `).join("")}
                     </select>
@@ -976,8 +1028,14 @@ async function renderOrdersTab(container) {
                       </div>
                     ` : ''}
                   </td>
-                  <td class="px-6 py-3.5 text-right">
-                    <button class="open-order-details-btn px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-300 text-xs font-bold transition" data-order-id="${o.id}">
+                  <td class="px-6 py-3.5 text-right space-x-1 whitespace-nowrap">
+                    <button class="quick-copy-label-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold transition" data-order-id="${o.id}" title="Copy formatted shipping address for courier booking">
+                      📋 Label
+                    </button>
+                    <button class="quick-print-slip-btn px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-[11px] font-semibold transition" data-order-id="${o.id}" title="Print packing slip & invoice">
+                      🖨️ Bill
+                    </button>
+                    <button class="open-order-details-btn px-3 py-1.5 rounded-lg bg-rose-600/80 hover:bg-rose-500 text-white text-xs font-bold transition" data-order-id="${o.id}">
                       Manage / Dispatch →
                     </button>
                   </td>
@@ -1030,6 +1088,31 @@ async function renderOrdersTab(container) {
       await db.updateOrderStatusAsync(orderId, newStatus);
       showToast(`Order ${orderId} updated to ${newStatus}.`, "success");
       renderOrdersTab(container);
+    });
+  });
+
+  container.querySelectorAll(".quick-copy-label-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const orderId = e.currentTarget.dataset.orderId;
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        const text = generateShippingLabelText(order, storeInfo);
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`📋 Courier label for Order ${orderId} copied! Paste directly into Delhivery / Shiprocket.`, "success");
+        }).catch(() => {
+          showToast(`Label text generated. Open order modal to view.`, "info");
+        });
+      }
+    });
+  });
+
+  container.querySelectorAll(".quick-print-slip-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const orderId = e.currentTarget.dataset.orderId;
+      const order = orders.find(o => o.id === orderId);
+      if (order) {
+        printOrderInvoice(order, storeInfo);
+      }
     });
   });
 
@@ -1236,6 +1319,55 @@ function renderContentTab(container) {
           </div>
         </div>
 
+        <!-- Order Notifications & Courier Alerts -->
+        <div class="p-6 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+          <div class="border-b border-slate-800 pb-3 flex items-center justify-between">
+            <div>
+              <h3 class="font-serif font-bold text-white text-base">Order Notifications & Courier Alerts</h3>
+              <p class="text-xs text-slate-400">Configure how you receive new order alerts and automated webhooks.</p>
+            </div>
+            <span class="text-xs bg-rose-950 text-rose-300 px-2.5 py-1 rounded-full font-bold">Alert Channels</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Store Owner WhatsApp (For Order Alerts)</label>
+              <input
+                type="text"
+                id="content-notification-whatsapp"
+                value="${settings.notificationWhatsapp || settings.storeInfo?.whatsapp || '+918824844263'}"
+                placeholder="+91 88248 44263"
+                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
+              />
+              <p class="text-[10px] text-slate-500 mt-1">Customers receive a 1-click button at checkout to send order details to this WhatsApp number.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Store Notification Email</label>
+              <input
+                type="email"
+                id="content-notification-email"
+                value="${settings.notificationEmail || ''}"
+                placeholder="e.g. orders@sheandshekidswear.com"
+                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500"
+              />
+              <p class="text-[10px] text-slate-500 mt-1">Email address where order summaries are directed.</p>
+            </div>
+
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold text-slate-300 mb-1">Order Webhook URL (Zapier / Make / Email / Telegram)</label>
+              <input
+                type="url"
+                id="content-order-webhook"
+                value="${settings.orderWebhookUrl || ''}"
+                placeholder="https://hook.eu1.make.com/... or Zapier webhook"
+                class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs focus:ring-2 focus:ring-rose-500 font-mono"
+              />
+              <p class="text-[10px] text-slate-500 mt-1">Optional HTTP POST endpoint triggered automatically whenever a new customer order is placed.</p>
+            </div>
+          </div>
+        </div>
+
         <button
           type="submit"
           class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-rose-600 hover:from-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-600/30 transition"
@@ -1263,6 +1395,9 @@ function renderContentTab(container) {
       razorpayKeyId: document.getElementById("content-razorpay-key").value,
       aboutContent: document.getElementById("content-about").value,
       returnPolicy: document.getElementById("content-return-policy").value,
+      notificationWhatsapp: document.getElementById("content-notification-whatsapp")?.value || '+918824844263',
+      notificationEmail: document.getElementById("content-notification-email")?.value || '',
+      orderWebhookUrl: document.getElementById("content-order-webhook")?.value || '',
       storeInfo: {
         ...current.storeInfo,
         phone: document.getElementById("content-phone").value,
@@ -2102,13 +2237,20 @@ async function openOrderModal(orderId) {
   }
   if (!order) return;
 
+  const settings = db.getSettings();
+  const storeInfo = settings?.storeInfo || {};
+
   const modalContainer = document.getElementById("admin-modal-container");
   if (!modalContainer) return;
+
+  let cleanPhone = (order.customer.phone || "").replace(/\D/g, "");
+  if (cleanPhone.length === 10) cleanPhone = "91" + cleanPhone;
 
   modalContainer.innerHTML = `
     <div id="order-details-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       <div class="bg-slate-900 rounded-3xl w-full max-w-2xl border border-slate-800 shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh]">
         
+        <!-- Header -->
         <div class="px-6 py-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
           <div>
             <div class="flex items-center gap-2">
@@ -2117,7 +2259,7 @@ async function openOrderModal(orderId) {
                 ${order.orderStatus}
               </span>
             </div>
-            <p class="text-[11px] text-slate-400">Placed on ${formatDate(order.createdAt)}</p>
+            <p class="text-[11px] text-slate-400">Placed on ${formatDate(order.createdAt)} • Mode: <span class="text-white font-semibold">${order.paymentMethod || 'Cash on Delivery'}</span> (${order.paymentStatus})</p>
           </div>
           <button id="close-order-modal-btn" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm transition">
             ✕
@@ -2126,54 +2268,108 @@ async function openOrderModal(orderId) {
 
         <div class="p-6 overflow-y-auto space-y-5 text-xs text-slate-300">
           
+          <!-- Quick Action Toolbar for Store Owner -->
+          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-rose-950/40 via-slate-950 to-slate-900 border border-rose-800/50 flex flex-wrap items-center gap-2">
+            <span class="text-[11px] font-bold text-rose-300 mr-1">⚡ Quick Actions:</span>
+            
+            <button id="modal-copy-label-btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700">
+              📋 Copy Courier Label
+            </button>
+
+            <button id="modal-print-invoice-btn" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700">
+              🖨️ Print Packing Slip / Bill
+            </button>
+
+            ${cleanPhone ? `
+              <a href="https://wa.me/${cleanPhone}?text=${encodeURIComponent(`Hello ${order.customer.name}, regarding your She & She Kids Wear Order ${order.id}...`)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm">
+                💬 WhatsApp Customer
+              </a>
+
+              <a href="${generateCustomerTrackingWhatsAppUrl(order, storeInfo)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-indigo-700 hover:bg-indigo-600 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-sm" title="Send shipment dispatch & tracking link via WhatsApp">
+                📦 WhatsApp Tracking
+              </a>
+            ` : ''}
+          </div>
+
           <!-- Customer & Address Information -->
-          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
-            <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Customer & Delivery Address</h4>
-            <div class="grid grid-cols-2 gap-2 text-slate-300">
-              <div><b>Name:</b> ${order.customer.name}</div>
-              <div><b>Phone:</b> <a href="tel:${order.customer.phone}" class="text-rose-400 hover:underline">${order.customer.phone}</a></div>
-              <div><b>Email:</b> ${order.customer.email || 'None provided'}</div>
-              <div><b>City / PIN:</b> ${order.customer.city || 'Kota'}, ${order.customer.pincode}</div>
-              <div class="col-span-2"><b>Complete Address:</b> ${order.customer.address}, ${order.customer.city}, ${order.customer.state} - ${order.customer.pincode}</div>
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2.5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Customer & Delivery Address</h4>
+              <span class="text-[11px] text-slate-400 font-mono">PIN: <strong class="text-white">${order.customer.pincode}</strong></span>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+              <div><b>Customer Name:</b> <span class="text-white font-bold">${order.customer.name}</span></div>
+              <div><b>Mobile Number:</b> <a href="tel:${order.customer.phone}" class="text-rose-400 font-mono font-bold hover:underline">${order.customer.phone}</a></div>
+              <div><b>Email:</b> <span class="text-slate-300">${order.customer.email || 'None provided'}</span></div>
+              <div><b>City & State:</b> <span class="text-white font-semibold">${order.customer.city || 'Kota'}, ${order.customer.state || 'Rajasthan'}</span></div>
+              <div class="col-span-1 sm:col-span-2 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-slate-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">Complete Delivery Address:</span>
+                <span class="text-white font-medium">${order.customer.address}, ${order.customer.city || 'Kota'}, ${order.customer.state || 'Rajasthan'} - <strong>${order.customer.pincode}</strong></span>
+              </div>
             </div>
           </div>
 
           <!-- Items Ordered -->
           <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-            <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Ordered Items</h4>
+            <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Ordered Items (${(order.items || []).length})</h4>
             <div class="divide-y divide-slate-800">
-              ${order.items.map(item => `
+              ${(order.items || []).map(item => `
                 <div class="py-2.5 flex items-center justify-between gap-3">
                   <div class="flex items-center gap-3">
-                    <img src="${item.image || 'https://placehold.co/100'}" class="w-10 h-10 rounded-lg object-cover border border-slate-700" />
+                    <img src="${item.image || 'https://placehold.co/100'}" class="w-12 h-12 rounded-xl object-cover border border-slate-700 shrink-0" />
                     <div>
                       <div class="font-bold text-white">${item.name}</div>
-                      <div class="text-[10px] text-slate-400">Size: <span class="text-rose-300 font-bold">${item.size || 'Free'}</span> • Colour: <span class="text-rose-300 font-bold">${item.color || 'Standard'}</span></div>
+                      <div class="text-[11px] text-slate-400 mt-0.5">
+                        Size: <span class="text-rose-300 font-bold px-1.5 py-0.2 rounded bg-slate-900 border border-slate-700">${item.size || 'Free'}</span>
+                        • Colour: <span class="text-rose-300 font-bold px-1.5 py-0.2 rounded bg-slate-900 border border-slate-700">${item.color || 'Standard'}</span>
+                      </div>
                     </div>
                   </div>
                   <div class="text-right">
                     <div class="font-bold text-white">${formatCurrency(item.price)} × ${item.quantity}</div>
-                    <div class="text-[10px] text-slate-400 font-bold">${formatCurrency(item.price * item.quantity)}</div>
+                    <div class="text-[11px] text-rose-300 font-bold">${formatCurrency(item.price * item.quantity)}</div>
                   </div>
                 </div>
               `).join("")}
             </div>
 
-            <div class="pt-3 border-t border-slate-800 flex justify-between font-bold text-white text-sm">
-              <span>Order Grand Total:</span>
-              <span class="text-rose-400">${formatCurrency(order.total)}</span>
+            <div class="pt-3 border-t border-slate-800 space-y-1 text-slate-400">
+              <div class="flex justify-between">
+                <span>Items Subtotal:</span>
+                <span class="text-white">${formatCurrency(order.subtotal || order.total)}</span>
+              </div>
+              ${order.shipping ? `
+                <div class="flex justify-between">
+                  <span>Shipping Fee:</span>
+                  <span class="text-white">${formatCurrency(order.shipping)}</span>
+                </div>
+              ` : ''}
+              ${order.discount ? `
+                <div class="flex justify-between text-emerald-400">
+                  <span>Discount:</span>
+                  <span>-${formatCurrency(order.discount)}</span>
+                </div>
+              ` : ''}
+              <div class="pt-2 border-t border-slate-800 flex justify-between font-bold text-white text-base">
+                <span>Order Total:</span>
+                <span class="text-rose-400">${formatCurrency(order.total)}</span>
+              </div>
             </div>
           </div>
 
           <!-- Dispatch & Tracking Controls -->
           <form id="order-dispatch-form" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-            <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Update Shipment & Status</h4>
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+              <h4 class="font-bold text-white text-xs uppercase tracking-wider text-rose-300">Courier Delivery & Order Status</h4>
+              <span class="text-[11px] text-slate-400">7-Step Fulfillment</span>
+            </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label class="block text-[11px] font-bold text-slate-300 mb-1">Order Status</label>
-                <select id="modal-order-status" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs">
-                  ${["Pending", "Confirmed", "Processing", "Shipped", "Delivered", "Cancelled"].map(st => `
+                <select id="modal-order-status" class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-bold focus:ring-1 focus:ring-rose-500">
+                  ${ORDER_STATUSES.map(st => `
                     <option value="${st}" ${order.orderStatus === st ? 'selected' : ''}>${st}</option>
                   `).join("")}
                 </select>
@@ -2184,10 +2380,19 @@ async function openOrderModal(orderId) {
                 <input
                   type="text"
                   id="modal-courier-name"
+                  list="courier-suggestions"
                   placeholder="e.g. Delhivery, BlueDart, DTDC"
                   value="${order.courier || 'Delhivery Express Kota'}"
                   class="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs"
                 />
+                <datalist id="courier-suggestions">
+                  <option value="Delhivery Express Kota"></option>
+                  <option value="BlueDart Express"></option>
+                  <option value="DTDC Express"></option>
+                  <option value="Shiprocket"></option>
+                  <option value="India Post Speed Post"></option>
+                  <option value="Local Store Delivery / Kota Pickup"></option>
+                </datalist>
               </div>
 
               <div>
@@ -2202,7 +2407,7 @@ async function openOrderModal(orderId) {
               </div>
 
               <div>
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Tracking Link</label>
+                <label class="block text-[11px] font-bold text-slate-300 mb-1">Live Tracking URL</label>
                 <input
                   type="url"
                   id="modal-tracking-link"
@@ -2213,9 +2418,10 @@ async function openOrderModal(orderId) {
               </div>
             </div>
 
-            <div class="pt-3 flex justify-end">
-              <button type="submit" class="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition">
-                Update Shipment 📦
+            <div class="pt-3 flex flex-wrap items-center justify-between gap-2">
+              <span class="text-[10px] text-slate-500">Updating status synchronizes immediately with customer tracking link & cloud database.</span>
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition shadow-md shadow-rose-600/30">
+                Save & Update Shipment 📦
               </button>
             </div>
           </form>
@@ -2232,6 +2438,19 @@ async function openOrderModal(orderId) {
 
   document.getElementById("close-order-modal-btn")?.addEventListener("click", closeModal);
 
+  document.getElementById("modal-copy-label-btn")?.addEventListener("click", () => {
+    const text = generateShippingLabelText(order, storeInfo);
+    navigator.clipboard.writeText(text).then(() => {
+      showToast(`📋 Shipping label copied! Ready to paste into courier portal.`, "success");
+    }).catch(() => {
+      showToast(`Unable to copy to clipboard automatically.`, "error");
+    });
+  });
+
+  document.getElementById("modal-print-invoice-btn")?.addEventListener("click", () => {
+    printOrderInvoice(order, storeInfo);
+  });
+
   document.getElementById("order-dispatch-form")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     const newStatus = document.getElementById("modal-order-status").value;
@@ -2245,8 +2464,10 @@ async function openOrderModal(orderId) {
       trackingLink
     });
 
-    showToast(`Order ${order.id} updated to ${newStatus}!`, "success");
+    showToast(`Order ${order.id} status updated to "${newStatus}"!`, "success");
     closeModal();
     renderActiveTab();
+  });
+}
   });
 }

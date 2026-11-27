@@ -4,11 +4,12 @@
  * Razorpay test gateway integration, COD, UPI, and instant order creation.
  */
 
-import { db } from "../db.js";
-import { formatCurrency } from "../utils/formatters.js";
-import { getAppliedCoupon } from "./cartDrawer.js";
-import { initiateRazorpayPayment } from "../utils/razorpay.js";
-import { showToast } from "../utils/toast.js";
+import { db } from "../db.js?v=3.3";
+import { formatCurrency } from "../utils/formatters.js?v=3.3";
+import { getAppliedCoupon } from "./cartDrawer.js?v=3.3";
+import { initiateRazorpayPayment } from "../utils/razorpay.js?v=3.3";
+import { showToast } from "../utils/toast.js?v=3.3";
+import { generateStoreWhatsAppOrderUrl } from "../utils/orderNotification.js?v=3.3";
 
 const INDIAN_STATES = [
   "Rajasthan", "Delhi", "Maharashtra", "Gujarat", "Uttar Pradesh", "Madhya Pradesh",
@@ -317,6 +318,9 @@ export function renderCheckoutModal() {
  * Renders the Order Success confirmation screen after successful payment
  */
 export function renderOrderSuccessView(order) {
+  const settings = db.getSettings();
+  const whatsappUrl = generateStoreWhatsAppOrderUrl(order, settings.storeInfo?.whatsapp || '918824844263');
+
   return `
     <div id="order-success-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
       <div id="order-invoice-area" class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-rose-100 overflow-hidden my-auto p-6 sm:p-10 animate-in fade-in zoom-in-95 duration-200">
@@ -386,6 +390,26 @@ export function renderOrderSuccessView(order) {
           <div class="font-bold text-slate-800 mb-1">📦 Delivery Destination:</div>
           <div>${order.customer.name} (${order.customer.phone})</div>
           <div>${order.customer.address}, ${order.customer.city}, ${order.customer.state} - ${order.customer.pincode}</div>
+        </div>
+
+        <!-- Instant WhatsApp Store Notification Banner -->
+        <div class="mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center space-y-2.5">
+          <div class="flex items-center justify-center gap-2 text-emerald-900 font-bold text-xs">
+            <span class="text-base">💬</span>
+            <span>Notify Store Owner on WhatsApp</span>
+          </div>
+          <p class="text-[11px] text-emerald-700 max-w-md mx-auto">
+            Click below to instantly send your complete order summary to our Dadabari Kota store team on WhatsApp for fastest packing & confirmation!
+          </p>
+          <a
+            href="${whatsappUrl}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-2 w-full py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-200 transition"
+          >
+            <span>💬 Send Order Details via WhatsApp (+91 88248 44263)</span>
+            <span>↗</span>
+          </a>
         </div>
 
         <!-- Action Buttons -->

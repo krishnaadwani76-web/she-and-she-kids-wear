@@ -4,8 +4,8 @@
  * or mobile number, with interactive timeline and courier details.
  */
 
-import { db } from "../db.js";
-import { formatCurrency, formatDate } from "../utils/formatters.js";
+import { db } from "../db.js?v=3.3";
+import { formatCurrency, formatDate } from "../utils/formatters.js?v=3.3";
 
 export function renderOrderTrackingModal(initialOrderId = "") {
   return `
@@ -78,24 +78,38 @@ export function buildTrackingTimelineHTML(order) {
     `;
   }
 
+  const isCancelled = order.orderStatus === "Cancelled";
+
   const steps = [
-    { title: "Order Placed", desc: "We received your order", status: "completed" },
+    {
+      title: "Order Received",
+      desc: order.orderStatus === "New Order" ? "Order received, awaiting merchant confirmation" : "Order confirmed by Dadabari store team",
+      status: isCancelled ? "cancelled" : "completed"
+    },
     {
       title: "Processing & Quality Check",
-      desc: "Carefully checked & ironed at Dadabari store",
-      status: ["Processing", "Shipped", "Delivered"].includes(order.orderStatus)
+      desc: ["Confirmed", "Processing", "Ready for Shipping"].includes(order.orderStatus)
+        ? "Carefully checked, packed & steam-ironed"
+        : ["Shipped", "Delivered"].includes(order.orderStatus)
+        ? "Quality check & packing completed"
+        : "Awaiting confirmation & packing",
+      status: isCancelled ? "cancelled" : ["Confirmed", "Processing", "Ready for Shipping", "Shipped", "Delivered"].includes(order.orderStatus)
         ? "completed"
         : "pending"
     },
     {
       title: "Dispatched / In Transit",
-      desc: `${order.courier || "BlueDart Express"} (Tracking: ${order.trackingNumber || "Assigned"})`,
-      status: ["Shipped", "Delivered"].includes(order.orderStatus) ? "completed" : "pending"
+      desc: order.trackingNumber
+        ? `${order.courier || "Delhivery Express Kota"} (AWB: ${order.trackingNumber})`
+        : order.orderStatus === "Ready for Shipping"
+        ? "Packed & scheduled for courier pickup"
+        : "Tracking details will be assigned upon courier dispatch",
+      status: isCancelled ? "cancelled" : ["Shipped", "Delivered"].includes(order.orderStatus) ? "completed" : "pending"
     },
     {
       title: "Out for Delivery & Delivered",
-      desc: order.orderStatus === "Delivered" ? "Successfully delivered" : "Expected in 2–4 business days",
-      status: order.orderStatus === "Delivered" ? "completed" : "pending"
+      desc: order.orderStatus === "Delivered" ? "Successfully delivered to customer" : "Expected delivery within 2–4 business days",
+      status: isCancelled ? "cancelled" : order.orderStatus === "Delivered" ? "completed" : "pending"
     }
   ];
 
@@ -114,14 +128,22 @@ export function buildTrackingTimelineHTML(order) {
         </div>
         <div>
           <span class="text-slate-400 block">Current Status</span>
-          <span class="inline-block mt-0.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+          <span class="inline-block mt-0.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
             order.orderStatus === "Delivered"
               ? "bg-emerald-100 text-emerald-800"
               : order.orderStatus === "Shipped"
+              ? "bg-indigo-100 text-indigo-800"
+              : order.orderStatus === "Ready for Shipping"
+              ? "bg-amber-100 text-amber-800"
+              : order.orderStatus === "Processing"
+              ? "bg-purple-100 text-purple-800"
+              : order.orderStatus === "Confirmed"
               ? "bg-blue-100 text-blue-800"
-              : "bg-amber-100 text-amber-800"
+              : order.orderStatus === "Cancelled"
+              ? "bg-slate-200 text-slate-800"
+              : "bg-rose-100 text-rose-800"
           }">
-            ${order.orderStatus}
+            ${order.orderStatus || 'New Order'}
           </span>
         </div>
         <div>

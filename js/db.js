@@ -7,9 +7,10 @@
  * Full CRUD operations for Products, Categories, Orders, Customers, and Website Settings.
  */
 
-import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=3.2";
-import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=3.2";
-import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=3.2";
+import { INITIAL_PRODUCTS, CATEGORIES as DEFAULT_CATEGORIES, STORE_INFO } from "./data/seedProducts.js?v=3.3";
+import { isSupabaseConfigured, getSupabaseConfig } from "./config.js?v=3.3";
+import { getSupabaseClient, testConnection } from "./supabaseClient.js?v=3.3";
+import { dispatchOrderWebhook } from "./utils/orderNotification.js?v=3.3";
 
 export const DB_KEYS = {
   PRODUCTS: "sskw_products_v1",
@@ -24,6 +25,16 @@ export const DB_KEYS = {
   INQUIRIES: "sskw_inquiries_v1",
   NEWSLETTER: "sskw_newsletter_v1"
 };
+
+export const ORDER_STATUSES = [
+  "New Order",
+  "Confirmed",
+  "Processing",
+  "Ready for Shipping",
+  "Shipped",
+  "Delivered",
+  "Cancelled"
+];
 
 class StoreDB {
   constructor() {
@@ -99,6 +110,9 @@ class StoreDB {
         razorpayKeyId: "rzp_test_sheandshe_kids",
         enableCod: true,
         enableRazorpay: true,
+        notificationEmail: "care@sheandshekidswear.com",
+        notificationWhatsapp: "+918824844263",
+        orderWebhookUrl: "",
         // Homepage content controls
         heroHeading: "Making Every Childhood More Stylish.",
         heroSubtitle: "Discover adorable outfits for every little moment. From royal festive frocks and dapper kurta sets to everyday organic playwear — crafted with pure breathable fabrics for happy, active kids.",
@@ -1045,6 +1059,10 @@ class StoreDB {
     if (isSupabaseConfigured()) {
       await this.pushOrderToSupabase(newOrder);
     }
+    const settings = this.getSettings();
+    if (settings && settings.orderWebhookUrl) {
+      dispatchOrderWebhook(newOrder, settings.orderWebhookUrl).catch(e => console.warn("Webhook dispatch error:", e));
+    }
     return newOrder;
   }
 
@@ -1389,10 +1407,10 @@ class StoreDB {
       paymentMethod: orderData.paymentMethod,
       paymentId: orderData.paymentId || `pay_${Date.now()}`,
       paymentStatus: (orderData.paymentMethod || "").includes("COD") ? "Pending on Delivery" : (orderData.paymentStatus || "Paid"),
-      orderStatus: "Processing",
-      courier: "Delhivery Express Kota",
-      trackingNumber: `DL-${Math.floor(10000000 + Math.random() * 90000000)}`,
-      trackingLink: `https://www.delhivery.com/track/package/DL-${Math.floor(10000000 + Math.random() * 90000000)}`
+      orderStatus: orderData.orderStatus || "New Order",
+      courier: orderData.courier || "Delhivery Express Kota",
+      trackingNumber: orderData.trackingNumber || "",
+      trackingLink: orderData.trackingLink || ""
     };
 
     orders.unshift(newOrder);
